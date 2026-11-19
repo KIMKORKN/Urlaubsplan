@@ -464,7 +464,8 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
       </div>
       <div class="row"><button class="btn" id="saveSettings">Übernehmen</button></div>
       <h2 style="margin-top:18px">Datensicherung</h2>
-      <div class="hint" style="margin-top:0">Deine Einträge bleiben nur in diesem Browser gespeichert. Sichere sie ab und zu als Datei.</div>
+      <div class="hint" style="margin-top:0">Deine Einträge bleiben auf diesem Gerät gespeichert. Sichere sie trotzdem ab und zu.</div>
+      <div class="hint" id="storeInfo"></div>
       <div class="row">
         <button class="btn" id="exportBtn">Als Datei sichern</button>
         <button class="btn" id="copyBtn">Als Text kopieren</button>
@@ -610,7 +611,10 @@ function storeWarn(t){$("storeWarnTxt").textContent=t;$("storeWarn").hidden=fals
 function save(){var txt=JSON.stringify(S),t=Date.now();
   try{localStorage.setItem(KEY,txt);localStorage.setItem(KEY+".t",String(t));if(localStorage.getItem(KEY)!==txt)throw 0;lsOk=true}
   catch(e){if(lsOk)storeWarn("Dein Browser lässt das Speichern nicht zu (z. B. Privates Surfen oder „Alle Cookies blockieren“ in den Safari-Einstellungen). Sichere deine Daten unter Optionen.");lsOk=false}
-  idbPut(txt,t);cloudSave()}
+  idbPut(txt,t);cloudSave();try{renderStore()}catch(e){}}
+function renderStore(){var el=$("storeInfo");if(!el)return;var t=localT(),n=Object.keys(S.urlaub||{}).length,where=(window.navigator.standalone||matchMedia("(display-mode: standalone)").matches)?"Home-Bildschirm-App":(window.claude?"Testversion":"Browser");
+  var txt="Speicherstand ("+where+"): "+n+" Urlaubstage, zuletzt gespeichert "+(t?new Date(t).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+" Uhr":"noch nie")+(lsOk?"":" · Speichern blockiert!")+(cloud?" · auch im Claude-Konto":"");
+  el.textContent=txt;if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(function(p){el.textContent=txt+(p?" · dauerhaft":"")}).catch(function(){})}
 function localT(){try{return +localStorage.getItem(KEY+".t")||0}catch(e){return 0}}
 function idb(){return new Promise(function(res,rej){try{var r=indexedDB.open("urlaubsplaner",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}}catch(e){rej(e)}})}
 function idbPut(txt,t){idb().then(function(db){var tx=db.transaction("kv","readwrite");tx.objectStore("kv").put({json:txt,t:t},"state")}).catch(function(){})}
@@ -1234,7 +1238,7 @@ $("copyBtn").addEventListener("click",function(){
   try{navigator.clipboard.writeText(txt).then(function(){toast("Sicherung in die Zwischenablage kopiert")},function(){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")})}catch(e){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")}
 });
 function importFrom(txt){
-  try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien||!o.vertretung)throw 0;snapshot();S=o;if(!S.team)S.team=["CT","SM","MPB"];if(!S.konten)S.konten={};save();render();toast("Daten geladen",true)}
+  try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien||!o.vertretung)throw 0;snapshot();S=migrate(o);S.setupDone=true;if(!S.team)S.team=["CT","SM","MPB"];if(!S.konten)S.konten={};for(var hk in hCache)delete hCache[hk];save();$("setup").hidden=true;render();renderStore();toast("Daten geladen und gespeichert",true)}
   catch(e){toast("Das ist keine gültige Sicherung des Urlaubsplaners.")}
 }
 $("importText").addEventListener("click",function(){importFrom($("ioText").value)});
@@ -1253,7 +1257,7 @@ render();
 showView((location.hash||"").slice(1)||"kalender",true);
 window.addEventListener("hashchange",function(){showView(location.hash.slice(1),true)});
 if(!S.setupDone)showSetup();
-restore();
+restore();renderStore();
 $("storeWarnX").addEventListener("click",function(){$("storeWarn").hidden=true});
 window.__planner={exportData:exportData,buildXlsx:buildXlsx,toTSV:toTSV,gleitCalc:gleitCalc,terminInstances:terminInstances,suggestions:suggestions,parseHM:parseHM,calc:calc,holidays:holidays,blocks:blocks,conflicts:conflicts,isWorkday:isWorkday,easter:easter,kw:kw,get state(){return S}};
 })();
