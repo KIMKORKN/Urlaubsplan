@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Urlaub">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f3f5f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Mein Urlaubsplaner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: iPad zuerst. Quer = Seitenleiste (Konto, Werkzeug) + 3 Monatsspalten; hoch = Kopfbereich oben + 3 Spalten; iPhone = 1 Spalte. */
+:root{
+  --bg:#f7f8fc; --surface:#ffffff; --surface-2:#eef0f6; --fg:#1b2230; --muted:#5d6878; --line:#d5dbe4;
+  --accent:#2f5d8a;
+  --urlaub:#ef7d1a; --urlaub-fg:#ffffff;
+  --we:#c8414f; --we-bg:#f9e9ec;
+  --feiertag:#00a04a; --feiertag-fg:#ffffff;
+  --nrw:#00b0f0; --ferien:#f2c200;
+  --vertr:#111111; --vertr-fg:#ffffff; --gleit:#a8d8ff; --gleit-fg:#0b3a5c; --vor-bg:rgba(239,125,26,.18);
+  --warn:#c4271b; --warn-bg:#fdeae7; --ok:#1d7a46;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-num:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --r:14px; --day:#e8ebf3; --pill:#dde7f7;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --surface:#18202a; --surface-2:#222c38; --fg:#e8edf3; --muted:#9aa6b5; --line:#2e3946;
+  --accent:#7fb2e5; --urlaub:#f28c28; --urlaub-fg:#1a1004; --we:#ff6b78; --we-bg:#2a1a1e;
+  --feiertag:#22b45f; --feiertag-fg:#06170d; --nrw:#2ec4f5; --ferien:#ffd43b;
+  --vertr:#000000; --vertr-fg:#ffffff; --gleit:#9ccfff; --gleit-fg:#062239; --vor-bg:rgba(242,140,40,.22); --warn:#ff7b6b; --warn-bg:#3a1d1a; --ok:#5fd18f; --day:#232c38; --pill:#2a3a52; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --surface:#18202a; --surface-2:#222c38; --fg:#e8edf3; --muted:#9aa6b5; --line:#2e3946;
+  --accent:#7fb2e5; --urlaub:#f28c28; --urlaub-fg:#1a1004; --we:#ff6b78; --we-bg:#2a1a1e;
+  --feiertag:#22b45f; --feiertag-fg:#06170d; --nrw:#2ec4f5; --ferien:#ffd43b;
+  --vertr:#000000; --vertr-fg:#ffffff; --gleit:#9ccfff; --gleit-fg:#062239; --vor-bg:rgba(242,140,40,.22); --warn:#ff7b6b; --warn-bg:#3a1d1a; --ok:#5fd18f; --day:#232c38; --pill:#2a3a52; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--font);font-size:15px;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.rail{position:fixed;z-index:15;background:var(--bg);display:flex;gap:4px}
+.rail button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:12px;font-weight:600;padding:8px 4px;border-radius:14px;min-width:64px}
+.rail svg{width:46px;height:30px;padding:3px 10px;border-radius:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail svg circle[r="1"]{fill:currentColor;stroke:none}
+.rail button[aria-current="page"]{color:var(--fg)}
+.rail button[aria-current="page"] svg{background:var(--pill)}
+@media (min-width:700px){
+  .rail{left:0;top:0;bottom:0;width:calc(88px + env(safe-area-inset-left,0px));flex-direction:column;align-items:center;padding:calc(20px + env(safe-area-inset-top,0px)) 0 20px env(safe-area-inset-left,0px);border-right:1px solid var(--line)}
+  .app{padding-left:calc(88px + max(24px,env(safe-area-inset-left,0px)))!important}
+}
+@media (max-width:699.98px){
+  .rail{left:0;right:0;bottom:0;justify-content:space-around;border-top:1px solid var(--line);padding:4px max(8px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .app{padding-bottom:110px!important}
+  .fab{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+  .daycard{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+}
+.app{padding-block:20px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1500px}
+.view{display:grid;gap:16px;align-content:start;min-width:0}
+.vh{font-size:30px;font-weight:500;margin:4px 0 4px}
+.hello{display:grid;gap:4px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hi{font-family:var(--font-num);font-size:clamp(24px,3vw,34px);font-weight:500}
+.big{font-family:var(--font-num);font-size:clamp(26px,4.2vw,50px);line-height:1.12;font-weight:400;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.bigsub{font-size:15px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.bigsub b{color:var(--fg);font-variant-numeric:tabular-nums}
+.daylist{margin-top:10px}
+.daylist summary{cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:600;font-size:14px;color:var(--accent)}
+.daylist h4{margin:12px 0 4px;font-size:14px}
+.daylist table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.daylist td{padding:4px 6px;border-bottom:1px solid var(--line)}
+.daylist td:first-child{width:36px;text-align:right;color:var(--muted)}
+.daylist tr.nc td{color:var(--warn)}
+.calcway{margin:12px 0 0;padding:12px 14px;background:var(--surface-2);border-radius:12px;display:grid;gap:4px;font-size:14px;font-variant-numeric:tabular-nums}
+.calcway div{display:flex;justify-content:space-between;gap:12px}
+.calcway .tot{border-top:1px solid var(--line);padding-top:6px;margin-top:4px;font-weight:700}
+.calcway small{color:var(--muted)}
+.big b{font-weight:600;font-variant-numeric:tabular-nums}
+.big b.neg{color:var(--warn)}
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding-block:10px;display:grid;gap:8px;border-bottom:1px solid var(--line)}
+.tbrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.tbrow .seg{flex:1 1 520px;max-width:720px}
+.seg button[data-mode="reset"][aria-pressed="true"]{background:var(--warn);color:var(--surface)}
+.tbrow.small{min-height:40px}
+.opts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.opts .lbl{width:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.tbrow .hint{margin:0}
+.warnbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:4px 14px}
+.warnbox summary{cursor:pointer;min-height:40px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.warnbox[open]{padding-bottom:12px}
+.wcount{background:var(--warn);color:var(--surface);border-radius:10px;padding:1px 8px;font-size:12px}
+.wcount.info{background:var(--accent)}
+.legbtn{justify-self:start}
+.scrim{position:fixed;inset:0;background:rgba(10,15,25,.45);z-index:40}
+.drawer{position:fixed;z-index:41;top:0;bottom:0;left:0;width:min(400px,92vw);background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;box-shadow:8px 0 30px rgba(0,0,0,.25);border-radius:0 22px 22px 0;padding:calc(14px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));transform:translateX(0)}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slidein .22s ease-out}}
+@keyframes slidein{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+.x{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-size:20px;line-height:1;color:var(--fg);flex:none}
+.dhead{display:flex;align-items:center;justify-content:space-between;position:sticky;top:calc(-14px - env(safe-area-inset-top,0px));background:var(--bg);padding-block:6px;z-index:1}
+.dh{font-size:24px;text-transform:none;letter-spacing:0;color:var(--fg);margin:0;font-family:var(--font-num);font-weight:600}
+.dsec{border-top:1px solid var(--line);padding-block:14px;display:grid;gap:10px}
+.dsec h3{margin:0;font-size:16px;font-weight:600}
+.wdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;max-width:340px}
+.wdays button{width:100%;aspect-ratio:1/1;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;color:var(--fg)}
+.wdays button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-size:15px;cursor:pointer}
+.tog input{appearance:none;-webkit-appearance:none;width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .15s}
+.tog input::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+.tog input:checked{background:var(--accent)}
+.tog input:checked::after{left:25px}
+.leg{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.leg li{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}
+.leg b{display:block;font-weight:600;font-size:15px}
+.leg small{display:block;color:var(--muted);font-size:12.5px;line-height:1.3}
+.d.demo{width:40px;height:40px;max-width:none;font-size:15px;pointer-events:none}
+.d.demo.out{opacity:.3}
+.fab{position:fixed;right:max(20px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:16;border:0;border-radius:20px;background:var(--pill);color:var(--fg);min-width:84px;height:76px;padding:6px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(20,30,60,.18)}
+.fab b{font-family:var(--font-num);font-size:32px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums}
+.fab b.neg{color:var(--warn)}
+.fab span{font-size:11px;color:var(--muted)}
+.daycard{position:fixed;z-index:16;left:calc(50% + 44px);transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));width:min(520px,calc(100% - 260px));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 52px 12px 16px;box-shadow:0 8px 24px rgba(20,30,60,.18)}
+.daycard{max-height:70vh;overflow:auto}
+.wtbox{display:flex;gap:12px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--surface-2)}
+.wtico{width:18px;height:18px;border-radius:4px;border:2.5px solid var(--fg);flex:none;margin-top:2px}
+.wtnote{margin:6px 0 0;font-size:14px;white-space:normal}
+.wtform{display:grid;gap:8px;margin-top:10px}
+.wtform label{display:grid;gap:3px;font-size:12.5px;color:var(--muted)}
+.wtform input,.wtform textarea{min-height:42px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:6px 10px;font:inherit;font-size:16px;color:var(--fg)}
+.wtt{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.btn.sm{min-height:38px;font-size:13px;padding:0 12px}
+.daycard .x{position:absolute;top:8px;right:8px}
+@media (max-width:699.98px){.daycard{left:16px;right:16px;transform:none;width:auto;padding-right:52px}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+h1{font-family:var(--font-num);font-size:22px;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:600}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.yearnav{display:flex;align-items:center;gap:4px}
+.yearnav button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:20px;line-height:1}
+.yearnav strong{font-family:var(--font-num);font-size:22px;min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.sub{color:var(--muted);font-size:13px;margin-top:2px}
+/* Konto */
+.konto{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kz{background:var(--surface-2);border-radius:10px;padding:8px 6px;text-align:center;min-width:0}
+.kz b{display:block;font-family:var(--font-num);font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kz span{font-size:11px;color:var(--muted);display:block;line-height:1.25}
+.kz.neg b{color:var(--warn)} .kz.pos b{color:var(--ok)}
+.bar{height:8px;border-radius:4px;background:var(--surface-2);margin-top:10px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--urlaub)}
+.bar i.over{background:var(--warn)}
+.kontonote{font-size:12.5px;color:var(--muted);margin-top:8px}
+/* Werkzeug */
+.seg{display:grid;grid-template-columns:repeat(6,auto);background:var(--surface-2);border-radius:10px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent;border-radius:8px;min-height:44px;font-weight:600;font-size:13px;padding:0 2px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.lbl{font-size:13px;color:var(--muted);width:100%}
+.chip{min-height:40px;min-width:48px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip.vt[aria-pressed="true"]{background:var(--vertr);color:var(--vertr-fg);border-color:var(--vertr)}
+.chip.ur[aria-pressed="true"]{background:var(--urlaub);color:var(--urlaub-fg);border-color:var(--urlaub)}
+.switch{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-size:14px}
+.switch input{width:22px;height:22px;accent-color:var(--accent)}
+.btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:14px}
+.btn:disabled{opacity:.45}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.exportp label.chk{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}.exportp label.chk input{margin-top:3px;width:18px;height:18px;flex:none}
+.hint.active{color:var(--accent);font-weight:600}
+/* Hinweise */
+.warns{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.warns li{background:var(--warn-bg);color:var(--fg);border-left:4px solid var(--warn);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.warns li.info{background:var(--surface-2);border-left-color:var(--accent)}
+.warns li button{all:unset;cursor:pointer;text-decoration:underline;color:var(--accent);font-weight:600}
+.okmsg{font-size:13.5px;color:var(--ok)}
+/* Tag-Info */
+.dayinfo{font-size:14px}
+.dayinfo b{font-size:16px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:12px;padding:3px 8px;border-radius:12px;background:var(--surface-2);font-weight:600}
+/* Legende */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:16px;height:16px;border-radius:4px;display:inline-block;flex:none}
+/* Monate */
+.months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 32px}
+@media (max-width:899.98px){.months{gap:22px 14px}}
+@media (max-width:559.98px){.months{grid-template-columns:1fr}}
+.month{min-width:0;scroll-margin-top:150px}
+.month.other{background:var(--surface-2);border-radius:var(--r);padding:8px 6px}
+.mhead{text-align:center;margin:0 0 6px;padding-left:14px}
+.mhead h3{margin:0;font-size:clamp(15px,1.8vw,22px);font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-family:var(--font-num)}
+.mhead small{display:block;font-size:12px;color:var(--muted);min-height:16px;font-variant-numeric:tabular-nums}
+.mhead small b{color:var(--urlaub)}
+.grid{display:grid;grid-template-columns:14px repeat(7,minmax(0,1fr));gap:7px 5px;align-items:center}
+.wd{text-align:center;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em}
+.wd.we{color:var(--we)}
+.kw{font-size:9px;color:var(--muted);align-self:start;padding-top:2px;font-variant-numeric:tabular-nums}
+.d{position:relative;width:calc(100% - 4px);max-width:44px;justify-self:center;aspect-ratio:1/1;border:0;border-radius:50%;background:var(--day);padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-num);font-size:clamp(12px,1.35vw,16px);font-variant-numeric:tabular-nums;line-height:1;overflow:hidden;color:var(--fg)}
+.d.empty{visibility:hidden;pointer-events:none}
+.d.wt{border-radius:22%;outline:2px solid var(--fg);outline-offset:2px}
+.d.wt.sel{outline:3px solid var(--fg);outline-offset:3px}
+.d.we{color:var(--we);background:var(--we-bg)}
+.d.ft{background:var(--feiertag);color:var(--feiertag-fg);font-weight:600}
+.d.ur{background:var(--urlaub);color:var(--urlaub-fg);font-weight:600}
+.d.vt{background:var(--vertr);color:var(--vertr-fg);font-weight:600}
+.d .ini{font-family:var(--font);font-size:7.5px;font-weight:700;margin-top:1px;letter-spacing:-.02em;max-width:100%;white-space:nowrap}
+.d{--fr:0 0 0 0 transparent;--ir:inset 0 0 0 0 transparent;box-shadow:var(--fr),var(--ir)}
+.d.fer{--fr:0 0 0 3px var(--ferien)}
+.d.conf{--ir:inset 0 0 0 3px var(--warn)}
+.d.conf::after{content:"!";position:absolute;top:8%;right:22%;font-size:11px;font-weight:800;color:var(--urlaub-fg)}
+.d.today{--ir:inset 0 0 0 2px var(--accent)}
+.d.sel{outline:3px solid var(--fg);outline-offset:1px}
+.d.anchor{outline:3px dashed var(--accent);outline-offset:1px}
+.d.out{opacity:.3;pointer-events:none}
+.month.other{background:var(--surface-2)}
+.edges{display:grid;gap:6px;margin-top:10px}
+.edge{display:flex;align-items:baseline;gap:8px;font-size:13px;background:var(--surface-2);border-radius:8px;padding:6px 10px;flex-wrap:wrap}
+.edge b{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.edge small{color:var(--muted);margin-left:auto}
+.d.gt{background:var(--gleit);color:var(--gleit-fg);font-weight:700}
+.d.vor{--ir:inset 0 0 0 2px var(--urlaub);background-image:repeating-linear-gradient(135deg,transparent 0 5px,var(--vor-bg) 5px 8px)}
+.d .ho{position:absolute;top:12%;left:calc(50% - 2.5px);width:5px;height:5px;border-radius:50%;background:var(--muted);opacity:.55}
+.d.ur .ho,.d.gt .ho,.d.vt .ho,.d.ft .ho{display:none}
+.gz{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:grid;gap:8px}
+.gzrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gzrow b{font-family:var(--font-num);font-size:24px;font-variant-numeric:tabular-nums}
+.gzrow b.neg{color:var(--warn)}
+.gzrow small{color:var(--muted);font-size:12.5px}
+.gzform{display:flex;gap:8px;flex-wrap:wrap}
+.gzform input{min-height:44px;width:110px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:16px}
+.gzhist{font-size:12.5px;color:var(--muted);margin:0;padding-left:18px}
+.tglrow{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+.tlist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tlist li{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.tlist li:last-child{border-bottom:0}
+.tlist .meta{grid-column:2/4;color:var(--muted);font-size:12.5px}
+.tlist .acts{display:flex;gap:6px}
+.tlist li.off{opacity:.5}
+.tadd{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tadd label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.tadd input,.tadd select{min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(10,15,22,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal .card{background:var(--surface);color:var(--fg);border-radius:16px;padding:22px;width:min(480px,100%);display:grid;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:100%;overflow:auto}
+.modal h2{font-size:20px;text-transform:none;letter-spacing:0;color:var(--fg);margin:0;font-family:var(--font-num)}
+.modal label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.modal input{min-height:48px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-size:18px}
+.modal .err{color:var(--warn);font-size:13px}
+.btn.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.nextcard{display:flex;gap:16px;align-items:center;background:var(--surface);border-radius:20px;padding:18px 20px;box-shadow:0 4px 18px rgba(20,30,60,.08)}
+.nt{display:block;font-family:var(--font-num);font-size:clamp(20px,2.4vw,28px);font-weight:600}
+.ns{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.tlfilter{display:flex;gap:4px 18px;flex-wrap:wrap}
+.timeline{display:grid;gap:8px}
+.tlm{display:flex;align-items:center;gap:12px;margin:14px 0 2px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tlm::after{content:"";flex:1;height:1px;background:var(--line)}
+.tli{display:grid;grid-template-columns:44px 40px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.tli.soft{background:transparent}
+.tdate{text-align:center;line-height:1.05}
+.tdate b{display:block;font-family:var(--font-num);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.tdate small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--ic-bg,var(--surface-2));color:var(--ic,var(--fg))}
+.tic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tic.big{width:56px;height:56px;border-radius:50%;flex:none;--ic-bg:var(--pill);--ic:var(--accent)}
+.tic.big svg{width:28px;height:28px}
+.ttx{min-width:0}
+.ttx b{display:block;font-weight:600;font-size:15px}
+.ttx small{display:block;color:var(--muted);font-size:13px}
+.tn{text-align:right;line-height:1.05}
+.tn b{display:block;font-family:var(--font-num);font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}
+.tn small{font-size:11px;color:var(--muted)}
+.k-urlaub{--ic-bg:var(--urlaub);--ic:var(--urlaub-fg)}
+.k-urlaub .tn b{color:var(--urlaub)}
+.k-feiertag{--ic-bg:var(--feiertag);--ic:var(--feiertag-fg)}
+.k-ferien{--ic-bg:var(--ferien);--ic:#2a2100}
+.k-vertr{--ic-bg:var(--vertr);--ic:var(--vertr-fg)}
+.k-termin{--ic-bg:var(--surface);--ic:var(--fg)}
+.k-termin .tic{border:2px solid var(--fg)}
+.k-gleit{--ic-bg:var(--gleit);--ic:var(--gleit-fg)}
+.k-bruecke{--ic-bg:var(--vor-bg);--ic:var(--urlaub)}
+.k-bruecke.soft{border:1px dashed var(--urlaub)}
+@media (max-width:559.98px){.tli{grid-template-columns:36px 34px minmax(0,1fr) auto;gap:8px}.tli>.x,.tli>span:last-child:empty{grid-column:4}.tic{width:34px;height:34px}}
+.effs{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.eff{background:var(--surface-2);border-radius:12px;padding:10px 12px;display:grid;gap:2px;font-size:13px}
+.eff b{font-size:14px}
+.eff span{color:var(--muted)}
+.eff .effn{color:var(--fg)}
+.eff em{font-style:normal;font-family:var(--font-num);font-weight:700;font-size:18px}
+.eff .effq{font-size:12px}
+.exportp .btn.primary{color:var(--surface)}
+.tsub{margin-top:6px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.tsub select{min-height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:14px;padding:0 6px}
+.dsub{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
+.dsub .chip{min-height:36px;min-width:44px}
+.cutlead{margin:14px 0 6px;font-size:14px}
+.cuts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.cuts li{display:grid;grid-template-columns:minmax(0,1fr) 64px 92px 76px auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.cuts li:last-child{border-bottom:0}
+.cl b{display:block;font-size:14px}.cl small{display:block;color:var(--muted);font-size:12px}
+.cs{text-align:center;line-height:1.1}.cs b{display:block;font-family:var(--font-num);font-size:20px;font-variant-numeric:tabular-nums}.cs small{font-size:11px;color:var(--muted)}
+.cs b.neg{color:var(--warn)}.cs b.okc{color:var(--ok)}
+@media (max-width:640px){.cuts li{grid-template-columns:repeat(3,1fr)}.cuts .cl{grid-column:1/-1}.cuts .btn{grid-column:1/-1}}
+/* Listen */
+.list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.list li{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.list li:last-child{border-bottom:0}
+.list .when{flex:1;min-width:0}
+.list .when small{display:block;color:var(--muted);font-size:12px}
+.list .n{font-family:var(--font-num);font-weight:700;font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.list .x{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-size:18px;line-height:1;flex:none}
+.dot{width:12px;height:12px;border-radius:3px;flex:none}
+.cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+details.panel summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+.form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:10px}
+.form label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.form input,.form select{min-height:44px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:0 10px;font-size:16px}
+textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:8px;font:12px ui-monospace,Menlo,monospace}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:14px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:20;max-width:calc(100% - 32px)}
+.toast button{border:0;background:transparent;color:inherit;font-weight:700;text-decoration:underline;min-height:32px}
+@media (prefers-reduced-motion:no-preference){.d{transition:background-color .12s}}
+</style>
+
+</head>
+<body>
+<nav class="rail" aria-label="Bereiche">
+  <button data-view="kalender"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14" r="1"/><circle cx="12" cy="14" r="1"/><circle cx="15.5" cy="14" r="1"/><circle cx="8.5" cy="17.3" r="1"/></svg><span>Kalender</span></button>
+  <button data-view="zeitstrahl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16"/><circle cx="6" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><path d="M11 7h9M11 12h6M11 17h9"/></svg><span>Zeitstrahl</span></button>
+  <button data-view="konto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Konto</span></button>
+  <button id="legOpen" aria-controls="legend" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="16" r="3"/></svg><span>Legende</span></button>
+  <button data-view="optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Optionen</span></button>
+</nav>
+<div class="app">
+  <section class="view" id="v-kalender">
+    <header class="hello">
+      <div class="hrow"><span class="hi">Hallo!</span>
+        <div class="yearnav"><button id="prevY" aria-label="Vorheriges Jahr">‹</button><strong id="yearLbl">2027</strong><button id="nextY" aria-label="Nächstes Jahr">›</button></div></div>
+      <p class="big" id="bigLine"></p>
+      <div class="bigsub" id="bigSub"></div>
+      <div class="sub" id="planSub"></div>
+    </header>
+    <div class="toolbar">
+      <div class="tbrow">
+        <div class="seg" role="group" aria-label="Tippen bedeutet">
+          <button data-mode="view">Ansehen</button>
+          <button data-mode="urlaub">Urlaub</button>
+          <button data-mode="gleit">Gleittag</button>
+          <button data-mode="vertr">Vertretung</button>
+          <button data-mode="termin">Termin</button>
+          <button data-mode="reset">Zurücksetzen</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="rangeMode"> Zeitraum</label>
+        <button class="btn" id="undo" disabled>↶ Rückgängig</button>
+      </div>
+      <div class="tbrow small">
+        <div id="urlaubOpts" class="opts"><span class="lbl">Wer vertritt mich?</span><div class="chips" id="subChips"></div></div>
+        <div id="vertrOpts" class="opts" hidden><span class="lbl">Wen vertrete ich?</span><div class="chips" id="coverChips"></div></div>
+        <div class="hint" id="modeHint"></div>
+      </div>
+    </div>
+    <details class="warnbox" id="warnBox"><summary id="warnSum">Hinweise</summary><div id="warns"></div></details>
+    <div class="months" id="months"></div>
+    <button class="btn legbtn" id="legOpen2">Farben erklären</button>
+  </section>
+
+  <section class="view" id="v-zeitstrahl" hidden>
+    <h1 class="vh">Zeitstrahl</h1>
+    <div class="nextcard" id="nextCard"></div>
+    <div class="panel exportp">
+      <h2>Ausgabe für Excel</h2>
+      <p class="sub" style="margin:0 0 10px">Alle Urlaubstage im Plan <span id="expRange"></span> mit Vertretung (fehlt sie, steht „NN“). Die Datei enthält fünf Blätter: Urlaubstage einzeln, Zeiträume, meine Vertretungen, wichtige Termine und die Büro-Zeile.</p>
+      <div class="row" style="margin:0">
+        <button class="btn primary" id="expXlsx">Excel-Datei speichern</button>
+        <button class="btn" id="expCopy">Tabelle kopieren</button>
+        <button class="btn" id="expCsv">Als CSV speichern</button>
+      </div>
+      <div class="hint" id="expInfo"></div>
+      <h2 style="margin-top:18px">Für die Büro-Tabelle</h2>
+      <p class="sub" style="margin:0 0 10px">Kopiert deine Zeile genau im Aufbau der Büro-Tabelle: ein Feld pro Tag vom 01.01.<span class="bzY"></span> bis 07.01.<span class="bzY2"></span> (Spalten C bis NJ). An Urlaubstagen steht die Vertretung oder „NN“. In der Büro-Tabelle tippst du auf die Zelle <b>C16</b> (deine Zeile) und wählst „Einsetzen“.</p>
+      <label class="chk"><input type="checkbox" id="bzVt" checked> Tage, an denen ich vertrete, als „1“ mitkopieren (so zählt die Büro-Tabelle sie nicht als Urlaub; in schwarz formatierten Zellen erscheint das Kürzel)</label>
+      <div class="row" style="margin:8px 0 0">
+        <button class="btn primary" id="bzCopy">Für Büro-Excel kopieren</button>
+      </div>
+      <div class="hint" id="bzInfo"></div>
+      <h2 style="margin-top:18px">Für den iPad-Kalender</h2>
+      <p class="sub" style="margin:0 0 10px">Eine Kalenderdatei mit deinen Urlauben (mit Vertretung), Gleittagen, Tagen, an denen du vertrittst, und wichtigen Terminen mit Uhrzeit. Am besten beim Hinzufügen einen eigenen Kalender „Urlaub“ wählen. Wenn du später etwas änderst, diesen Kalender vorher leeren, sonst stehen Einträge doppelt.</p>
+      <div class="row" style="margin:0">
+        <button class="btn primary" id="icsSave">Kalenderdatei speichern</button>
+      </div>
+      <div class="hint" id="icsInfo"></div>
+    </div>
+    <div class="tlfilter" role="group" aria-label="Anzeigen">
+      <label class="switch"><input type="checkbox" id="fFt" checked> Feiertage</label>
+      <label class="switch"><input type="checkbox" id="fFe" checked> Ferien</label>
+      <label class="switch"><input type="checkbox" id="fPast"> Vergangenes</label>
+    </div>
+    <div id="timeline" class="timeline"></div>
+    <div class="panel">
+      <h2>Feste Termine jedes Jahr</h2>
+      <ul class="tlist" id="termine"></ul>
+      <details id="taddBox"><summary class="hint" style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:600;color:var(--accent)">+ Eigenen Termin hinzufügen</summary>
+        <div class="tadd">
+          <label>Name<input id="tName" type="text" placeholder="z. B. Geburtstag Mama"></label>
+          <label>Regel<select id="tArt">
+            <option value="fest">Festes Datum (jedes Jahr gleich)</option>
+            <option value="feiertag">Ab einem Feiertag</option>
+            <option value="ferien">Während NRW-Ferien</option></select></label>
+          <label data-for="fest">Von (TT.MM.)<input id="tVon" type="text" inputmode="decimal" placeholder="24.12."></label>
+          <label data-for="fest">Bis (TT.MM.)<input id="tBis" type="text" inputmode="decimal" placeholder="26.12."></label>
+          <label data-for="feiertag" hidden>Feiertag<select id="tFt"></select></label>
+          <label data-for="feiertag" hidden>Bis<select id="tFtBis"><option value="tag">nur dieser Tag</option><option value="sonntag">bis zum folgenden Sonntag</option></select></label>
+          <label data-for="ferien" hidden>Ferien<select id="tFe"><option>Osterferien</option><option>Pfingstferien</option><option>Sommerferien</option><option>Herbstferien</option><option>Weihnachtsferien</option></select></label>
+          <label data-for="ferien" hidden>Beginn (Wochen nach Ferienstart)<input id="tVers" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
+          <label data-for="ferien" hidden>Dauer in Wochen (0 = bis Ferienende)<input id="tDauer" type="number" min="0" max="8" value="0" inputmode="numeric"></label>
+        </div>
+        <div class="row"><button class="btn" id="tAdd">Termin speichern</button></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="view" id="v-konto" hidden>
+    <h1 class="vh">Konto</h1>
+    <div class="panel" style="order:2"><h2>Kürzungshelfer und freie Tage</h2><div id="cutBox"></div></div>
+    <div class="panel">
+      <h2>Urlaubskonto <span id="kontoYear"></span> (Kalenderjahr)</h2>
+      <div class="konto" id="konto"></div>
+      <div class="bar" id="bar"></div>
+      <div class="kontonote" id="kontoNote"></div>
+      <div class="calcway" id="calcWay"></div>
+      <details class="daylist" id="dayListBox"><summary>Alle Urlaubstage einzeln zum Nachzählen</summary><div id="dayList"></div></details>
+      <div class="edges" id="edges"></div>
+      <div class="gz">
+        <h2 style="margin:0">Gleitzeit</h2>
+        <div class="gzrow" id="gzNow"></div>
+        <div class="gzform"><input id="gzInput" type="text" inputmode="decimal" placeholder="z. B. 14:30" aria-label="Gleitzeitstand in Stunden"><button class="btn" id="gzSave">Stand eintragen</button></div>
+        <ol class="gzhist" id="gzHist" reversed></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="v-optionen" hidden>
+    <h1 class="vh">Optionen</h1>
+    <div class="panel" id="settings">
+      <h2>Einstellungen</h2>
+      <div class="form">
+        <label>Urlaubsanspruch <span id="setYear1"></span><input id="sAnspruch" type="number" min="0" max="60" inputmode="numeric"></label>
+        <label>Resturlaub Vorjahr, Stand heute (Tage)<input id="sRest" type="number" min="0" max="60" inputmode="numeric"></label>
+        <label>Resttage nehmen bis<input id="sRestBis" type="date"></label>
+        <label>Arbeitszeit Mo–Do (h:mm)<input id="sAzMoDo" type="text" inputmode="decimal"></label>
+        <label>Arbeitszeit Fr (h:mm)<input id="sAzFr" type="text" inputmode="decimal"></label>
+        <label>Gleitzeit Höchstwert (h)<input id="sGzMax" type="number" min="0" max="200" inputmode="numeric"></label>
+        <label>Weitere dienstfreie Tage (TT.MM., Komma)<input id="sFrei" type="text" inputmode="decimal"></label>
+        <label>Team-Kürzel (Komma)<input id="sTeam" type="text" autocapitalize="characters"></label>
+        <label>Plan beginnt<select id="sVor"><option value="0">1. Januar</option><option value="1">1. Dezember Vorjahr</option><option value="2">1. November Vorjahr</option></select></label>
+        <label>Plan endet<select id="sNach"><option value="0">31. Dezember</option><option value="15">15. Januar Folgejahr</option><option value="31">31. Januar Folgejahr</option></select></label>
+      </div>
+      <div class="row"><button class="btn" id="saveSettings">Übernehmen</button></div>
+      <h2 style="margin-top:18px">Datensicherung</h2>
+      <div class="hint" style="margin-top:0">Deine Einträge bleiben nur in diesem Browser gespeichert. Sichere sie ab und zu als Datei.</div>
+      <div class="row">
+        <button class="btn" id="exportBtn">Als Datei sichern</button>
+        <button class="btn" id="copyBtn">Als Text kopieren</button>
+        <label class="btn" style="display:inline-flex;align-items:center">Datei laden<input id="importFile" type="file" accept=".json,application/json,text/plain" hidden></label>
+      </div>
+      <textarea id="ioText" placeholder="Hier erscheint der Sicherungstext. Zum Laden einen Sicherungstext einfügen und unten auf „Text laden“ tippen."></textarea>
+      <div class="row">
+        <button class="btn" id="importText">Text laden</button>
+        <button class="btn" id="resetBtn">Alles löschen und neu beginnen</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="scrim" id="legScrim" hidden></div>
+<aside class="drawer" id="legend" aria-label="Legende" hidden>
+  <div class="dhead"><h2 class="dh">Legende</h2><button class="x" id="legClose" aria-label="Legende schließen">×</button></div>
+  <div class="dsec">
+    <h3>Arbeitstage</h3>
+    <div class="wdays" id="wdWork"></div>
+  </div>
+  <div class="dsec">
+    <h3>Anzeigen</h3>
+    <label class="tog"><span>Feiertage NRW</span><input type="checkbox" id="tShowFt"></label>
+    <label class="tog"><span>Schulferien NRW (gelber Ring)</span><input type="checkbox" id="tNrw"></label>
+    <label class="tog"><span>Vorschläge (feste Termine, Brückentage)</span><input type="checkbox" id="tVor"></label>
+  </div>
+  <div class="dsec">
+    <h3>Farben</h3>
+    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht Mo–Do 8:45 h, Fr 6:00 h Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
+  </div>
+</aside>
+<div class="daycard" id="dayCard" hidden><div class="dayinfo" id="dayInfo"></div><button class="x" id="dayClose" aria-label="Schließen">×</button></div>
+<button class="fab" id="fab" aria-label="Zum Urlaubskonto"><b id="fabN"></b><span>Tage übrig</span></button>
+<div class="modal" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="setupT">
+  <form class="card" id="setupForm">
+    <h2 id="setupT">Willkommen in deinem Urlaubsplaner</h2>
+    <div class="sub" style="margin:0">Drei kurze Angaben, dann geht es los. Du kannst alles später in den Einstellungen ändern.</div>
+    <label><span>Wie viele Urlaubstage aus <span class="suY1"></span> hast du heute noch? (Was du davon im Dezember einträgst, wird abgezogen. Der Rest geht nach <span class="suY2"></span> und muss bis 31.05. genommen werden.)</span><input id="suRest" type="number" min="0" max="60" inputmode="numeric" required></label>
+    <label><span>Urlaubsanspruch <span class="suY2"></span> (Tage)</span><input id="suAnspruch" type="number" min="0" max="60" inputmode="numeric" value="30"></label>
+    <label>Aktueller Gleitzeitstand (h:mm, freiwillig)<input id="suGz" type="text" inputmode="decimal" placeholder="z. B. 14:30"></label>
+    <div class="err" id="suErr" hidden></div>
+    <button class="btn primary" type="submit">Los geht’s</button>
+    <button class="btn" type="button" id="suImport">Ich habe schon Daten (Sicherung laden)</button>
+  </form>
+</div>
+<div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" hidden>Rückgängig</button></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="urlaubsplaner.rm.v1";
+var MONTHS=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+var WD=["So","Mo","Di","Mi","Do","Fr","Sa"];
+var WDL=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+
+/* ---------- Datum ---------- */
+function iso(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0")}
+function parse(s){var p=s.split("-");return new Date(Date.UTC(+p[0],+p[1]-1,+p[2]))}
+function fmt(d){return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0")}
+function addDays(s,n){var d=parse(s);d.setUTCDate(d.getUTCDate()+n);return fmt(d)}
+function dow(s){return parse(s).getUTCDay()}
+function de(s,withYear){var p=s.split("-");return p[2]+"."+p[1]+"."+(withYear?p[0]:"")}
+function kw(s){var d=parse(s);var day=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-day+3);var f=new Date(Date.UTC(d.getUTCFullYear(),0,4));return 1+Math.round(((d-f)/864e5-3+((f.getUTCDay()+6)%7))/7)}
+function easter(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return iso(y,mo-1,da)}
+var hCache={};
+function holidays(y){
+  if(hCache[y])return hCache[y];
+  var e=easter(y),h={};
+  h[iso(y,0,1)]="Neujahr";h[addDays(e,-2)]="Karfreitag";h[addDays(e,1)]="Ostermontag";
+  h[iso(y,4,1)]="Tag der Arbeit";h[addDays(e,39)]="Christi Himmelfahrt";h[addDays(e,50)]="Pfingstmontag";
+  h[addDays(e,60)]="Fronleichnam";h[iso(y,9,3)]="Tag der Deutschen Einheit";h[iso(y,10,1)]="Allerheiligen";
+  h[iso(y,11,25)]="1. Weihnachtstag";h[iso(y,11,26)]="2. Weihnachtstag";
+  var NM={"12-24":"Heiligabend (dienstfrei)","12-31":"Silvester (dienstfrei)"};
+  ((typeof S!=="undefined"&&S&&S.freieTage)||["12-24","12-31"]).forEach(function(md){var k=y+"-"+md;if(!h[k])h[k]=NM[md]||"Dienstfrei"});
+  return hCache[y]=h;
+}
+function holiday(s){return holidays(+s.slice(0,4))[s]||null}
+function isWeekend(s){var w=dow(s);return w===0||w===6}
+function isWorkday(s){var at=(S&&S.arbeitstage)||[1,2,3,4,5];return at.indexOf(dow(s))>=0&&!holiday(s)}
+function isFree(s){var at=(S&&S.arbeitstage)||[1,2,3,4,5];return at.indexOf(dow(s))<0}
+
+function defaultTermine(){return [
+  {id:"ostern",name:"Osterurlaub (Wohnwagen)",art:"ferien",ferien:"Osterferien",vers:0,dauer:0,aktiv:true},
+  {id:"vatertag",name:"Vatertagsfahrt mit Brückentag",art:"feiertag",feiertag:"Christi Himmelfahrt",bis:"sonntag",aktiv:true},
+  {id:"sommer",name:"Sommerurlaub (Wohnwagen)",art:"ferien",ferien:"Sommerferien",vers:1,dauer:3,aktiv:true},
+  {id:"herbst",name:"Herbsturlaub",art:"ferien",ferien:"Herbstferien",vers:0,dauer:0,aktiv:true},
+  {id:"weihnachten",name:"Weihnachten bis erste Januarwoche",art:"fest",von:"12-27",bis:"KW1",aktiv:true}]}
+/* ---------- Startdaten (aus Excel-Urlaubsplan, Stand 19.11.2026) ---------- */
+function seed(){
+  var vac={};
+  /* leer: eigene Daten per Sicherung laden */
+  return {
+    version:2,
+    mig3003:true,
+    migFrei:true,
+    setupDone:false,
+    ansicht:{vorlauf:1,nachlauf:15},
+    optionen:{ft:true,nrw:true,vor:true},
+    arbeitstage:[1,2,3,4,5],
+    homeoffice:[1,5],
+    arbeitszeit:[0,525,525,525,525,360,0],
+    gleitMax:32,
+    gleitzeit:[],
+    gleittage:{},
+    wichtig:{},
+    freieTage:["12-24","12-31"],
+    termine:defaultTermine(),
+    team:[],
+    konten:{},
+    urlaub:vac,
+    vertretung:{},
+    ferien:{
+      nrw:[["2026-12-23","2027-01-06","Weihnachtsferien"],["2027-03-22","2027-04-03","Osterferien"],["2027-05-18","2027-05-18","Pfingstferien"],["2027-07-19","2027-08-31","Sommerferien"],["2027-10-23","2027-11-06","Herbstferien"],["2027-12-24","2028-01-08","Weihnachtsferien"]],
+      nds:[["2026-12-23","2027-01-09","Weihnachtsferien"],["2027-02-01","2027-02-02","Winterferien"],["2027-03-22","2027-04-03","Osterferien"],["2027-05-07","2027-05-07","Brückentag"],["2027-05-18","2027-05-18","Pfingstferien"],["2027-07-08","2027-08-18","Sommerferien"],["2027-10-16","2027-10-30","Herbstferien"],["2027-12-23","2028-01-08","Weihnachtsferien"]]
+    }
+  };
+}
+
+/* ---------- Zustand ---------- */
+var view="kalender";
+function showView(v,noHash){if(["kalender","zeitstrahl","konto","optionen"].indexOf(v)<0)v="kalender";view=v;
+  ["kalender","zeitstrahl","konto","optionen"].forEach(function(n){$("v-"+n).hidden=n!==v});
+  document.querySelectorAll(".rail button").forEach(function(b){if(b.dataset.view===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  $("fab").hidden=v==="konto";$("dayCard").hidden=!(selected&&v==="kalender");
+  if(!noHash){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo(0,0)}
+var editing=null;
+var S, year=2027, mode="urlaub", sub="NN", cover="CT", rangeOn=false, anchor=null, selected=null, undoStack=[];
+function load(){
+  try{var t=localStorage.getItem(KEY);if(t){var o=JSON.parse(t);if(o&&o.urlaub&&o.ferien)return migrate(o)}}catch(e){}
+  return seed();
+}
+function migrate(o){var d=seed();
+  ["ansicht","optionen","arbeitstage","homeoffice","arbeitszeit","gleitMax","gleitzeit","gleittage","wichtig","freieTage","termine","team","konten","vertretung"].forEach(function(k){if(o[k]===undefined)o[k]=d[k]});
+  ["ft","nrw","vor"].forEach(function(k){if(o.optionen[k]===undefined)o.optionen[k]=true});
+  Object.keys(o.konten||{}).forEach(function(y){var k=o.konten[y];if(k.stand===undefined){k.stand=k.rest||0;k.standDatum=todayIso;delete k.rest}});
+  if(!o.migFrei){Object.keys(o.urlaub).concat(Object.keys(o.gleittage||{})).forEach(function(d){if(/-12-(24|31)$/.test(d)){delete o.urlaub[d];if(o.gleittage)delete o.gleittage[d]}});o.migFrei=true}
+  if(!o.mig3003){if(o.vertretung["2027-03-30"]==="CT")delete o.vertretung["2027-03-30"];o.mig3003=true}
+  if(o.setupDone===undefined)o.setupDone=false;o.version=2;return o}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function snapshot(){undoStack.push(JSON.stringify(S));if(undoStack.length>50)undoStack.shift();$("undo").disabled=false}
+function undo(){if(!undoStack.length)return;S=JSON.parse(undoStack.pop());for(var hk in hCache)delete hCache[hk];save();$("undo").disabled=!undoStack.length;render();toast("Rückgängig gemacht")}
+/* Resturlaub: "stand" = Urlaubstage des Vorjahres, die am Stichtag noch übrig sind. Urlaub im Vorjahr ab dem Stichtag wird davon abgezogen, der Rest ist der Übertrag. */
+function konto(y){var k=S.konten[String(y)];
+  if(k){var st=k.stand!==undefined?k.stand:(k.rest||0),sd=k.standDatum||todayIso;
+    var dec=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===y-1&&d>=sd&&isWorkday(d)}).length;
+    return {anspruch:k.anspruch,restBis:k.restBis||iso(y,4,31),stand:st,standDatum:sd,vorjahrGeplant:dec,rest:Math.max(0,st-dec),vorjahrMinus:Math.max(0,dec-st)}}
+  var prev=S.konten[String(y-1)],rest=0;if(prev){rest=Math.max(0,calc(y-1).left)}
+  return {anspruch:prev?prev.anspruch:30,rest:rest,stand:rest,standDatum:null,vorjahrGeplant:0,vorjahrMinus:0,restBis:iso(y,4,31),auto:true}}
+function ansicht(){return S.ansicht||{vorlauf:1,nachlauf:15}}
+/* sichtbare Monate des Plans: Vorlauf im Dezember (u. a.) des Vorjahres, Nachlauf im Januar des Folgejahres */
+function viewMonths(){var a=ansicht(),out=[];
+  for(var i=a.vorlauf;i>0;i--)out.push({y:year-1,m:12-i,cut:31});
+  for(var m=0;m<12;m++)out.push({y:year,m:m,cut:31});
+  if(a.nachlauf>0)out.push({y:year+1,m:0,cut:a.nachlauf});
+  return out}
+function viewRange(){var v=viewMonths(),f=v[0],l=v[v.length-1];var len=new Date(Date.UTC(l.y,l.m+1,0)).getUTCDate();return [iso(f.y,f.m,1),iso(l.y,l.m,Math.min(l.cut,len))]}
+function inView(d){var r=viewRange();return d>=r[0]&&d<=r[1]}
+
+/* ---------- Zeit ---------- */
+function hm(min){var neg=min<0;min=Math.abs(Math.round(min));return (neg?"−":"")+Math.floor(min/60)+":"+String(min%60).padStart(2,"0")}
+function parseHM(t){t=String(t||"").trim().replace("−","-");if(!t)return null;var neg=t[0]==="-";if(neg||t[0]==="+")t=t.slice(1);
+  var m;if((m=t.match(/^(\d{1,3}):(\d{1,2})$/)))return (neg?-1:1)*(+m[1]*60+ +m[2]);
+  if((m=t.match(/^(\d{1,3})(?:[.,](\d+))?$/)))return (neg?-1:1)*Math.round(parseFloat(m[1]+"."+(m[2]||"0"))*60);return null}
+function soll(d){return (S.arbeitszeit||[])[dow(d)]||0}
+function isHO(d){return false}
+function gleitCalc(){
+  var hist=(S.gleitzeit||[]).slice().sort(function(a,b){return a.datum<b.datum?-1:1}),last=hist[hist.length-1]||null;
+  var after=Object.keys(S.gleittage).filter(function(d){return (!last||d>last.datum)&&isWorkday(d)}).sort();
+  var need=after.reduce(function(a,d){return a+soll(d)},0);
+  return {last:last,hist:hist,future:after,need:need,rest:last?last.min-need:null}
+}
+/* ---------- Feste Termine ---------- */
+function firstFullWeekFriday(y){var d=iso(y,0,1);while(dow(d)!==1)d=addDays(d,1);return addDays(d,4)}
+function terminRange(t,y){
+  if(t.art==="fest"){var from=y+"-"+t.von,to;
+    if(t.bis==="KW1")to=firstFullWeekFriday(y+1);else to=(t.bis<t.von?(y+1):y)+"-"+t.bis;return [from,to]}
+  if(t.art==="feiertag"){var h=holidays(y),k=Object.keys(h).filter(function(d){return h[d]===t.feiertag})[0];if(!k)return null;
+    var e=k;if(t.bis==="sonntag"){while(dow(e)!==0)e=addDays(e,1)}return [k,e]}
+  if(t.art==="ferien"){var f=S.ferien.nrw.filter(function(r){return r[2]===t.ferien&&+r[0].slice(0,4)===y})[0];if(!f)return null;
+    var a=addDays(f[0],7*(t.vers||0)),b=t.dauer?addDays(a,7*t.dauer-1):f[1];return [a,b]}
+  return null}
+function terminInstances(){var out=[],r=viewRange();
+  (S.termine||[]).forEach(function(t){[year-1,year].forEach(function(y){var g=terminRange(t,y);if(!g)return;
+    var a=g[0]<r[0]?r[0]:g[0],b=g[1]>r[1]?r[1]:g[1];if(a>b)return;
+    var days=[],x=a;while(x<=b){if(isWorkday(x))days.push(x);x=addDays(x,1)}
+    out.push({t:t,y:y,from:g[0],to:g[1],a:a,b:b,days:days,done:days.filter(function(d){return S.urlaub[d]}).length})})});
+  out.sort(function(p,q){return p.a<q.a?-1:1});return out}
+function suggestions(){var m={};terminInstances().forEach(function(i){if(!i.t.aktiv)return;i.days.forEach(function(d){if(!S.urlaub[d]&&!S.gleittage[d])m[d]=i.t.name})});return m}
+function terminAt(d){var n=null;terminInstances().forEach(function(i){if(i.t.aktiv&&d>=i.from&&d<=i.to)n=i.t.name});return n}
+function ruleText(t){
+  if(t.art==="fest")return "jedes Jahr "+t.von.split("-").reverse().join(".")+". bis "+(t.bis==="KW1"?"Ende der ersten vollen Januarwoche":t.bis.split("-").reverse().join(".")+".");
+  if(t.art==="feiertag")return t.feiertag+(t.bis==="sonntag"?" bis zum folgenden Sonntag":"");
+  if(t.art==="ferien")return "NRW-"+t.ferien+(t.vers?", ab "+t.vers+" Woche"+(t.vers>1?"n":"")+" nach Ferienbeginn":", ab Ferienbeginn")+(t.dauer?", "+t.dauer+" Wochen":", bis Ferienende");
+  return ""}
+
+/* ---------- Ferien ---------- */
+function ferienAt(list,s){for(var i=0;i<list.length;i++){if(s>=list[i][0]&&s<=list[i][1])return list[i][2]||"Ferien"}return null}
+
+/* ---------- Berechnung ---------- */
+function calc(y){
+  var k=konto(y), days=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===y&&isWorkday(d)}).sort();
+  var planned=days.length;
+  var beforeDeadline=days.filter(function(d){return d<=k.restBis}).length;
+  var restUsed=Math.min(k.rest,beforeDeadline);
+  var available=k.anspruch+restUsed;
+  return {k:k,days:days,planned:planned,restUsed:restUsed,restLost:k.rest-restUsed,available:available,left:available-planned};
+}
+function conflicts(){
+  return Object.keys(S.urlaub).concat(Object.keys(S.gleittage||{})).filter(function(d){return inView(d)&&(S.vertretung[d]||S.wichtig[d])}).sort();
+}
+function blocks(){
+  var days=Object.keys(S.urlaub).filter(inView).sort(),out=[],cur=null;
+  days.forEach(function(d){
+    if(cur){var nx=addDays(cur.to,1),gapOk=true;while(nx<d){if(isWorkday(nx)){gapOk=false;break}nx=addDays(nx,1)}
+      if(gapOk){cur.to=d;cur.days.push(d);return}}
+    cur={from:d,to:d,days:[d]};out.push(cur);
+  });
+  out.forEach(function(b){b.n=b.days.filter(isWorkday).length;var subs={};b.days.forEach(function(d){subs[S.urlaub[d]]=1});b.subs=Object.keys(subs).join(", ");
+    b.ferien=ferienAt(S.ferien.nrw,b.from)||ferienAt(S.ferien.nrw,b.to);
+    var tn=null;b.days.some(function(d){tn=terminAt(d);return tn});b.name=tn;
+    b.perYear={};b.days.filter(isWorkday).forEach(function(d){var y=d.slice(0,4);b.perYear[y]=(b.perYear[y]||0)+1});});
+  return out;
+}
+function coverGroups(){
+  var days=Object.keys(S.vertretung).filter(inView).sort(),out=[],cur=null;
+  days.forEach(function(d){
+    var who=S.vertretung[d];
+    if(cur&&cur.who===who){var nx=addDays(cur.to,1),ok=true;while(nx<d){if(isWorkday(nx)){ok=false;break}nx=addDays(nx,1)}if(ok){cur.to=d;cur.days.push(d);return}}
+    cur={from:d,to:d,who:who,days:[d]};out.push(cur);
+  });
+  return out;
+}
+
+/* ---------- Aktionen ---------- */
+function setVac(d,on){if(on){if(!isWorkday(d))return false;S.urlaub[d]=sub}else delete S.urlaub[d];return true}
+function tapDay(d){
+  if(!inView(d))return;
+  selected=d;
+  if(mode==="view"){renderDay();renderMonths();return}
+  if(rangeOn){
+    if(!anchor){anchor=d;renderMonths();renderDay();hint();return}
+    var a=anchor<d?anchor:d,b=anchor<d?d:anchor,src=anchor;anchor=null;
+    snapshot();var n=0,x=a;
+    if(mode==="urlaub"){var remove=!!S.urlaub[src];
+      while(x<=b){if(remove){if(S.urlaub[x]){delete S.urlaub[x];n++}}else if(isWorkday(x)&&!S.urlaub[x]){S.urlaub[x]=sub;delete S.gleittage[x];n++}x=addDays(x,1)}
+      toast((remove?"−":"+")+n+" Urlaubstage ("+de(a)+"–"+de(b)+")",true);
+    }else if(mode==="gleit"){var rg=!!S.gleittage[src],mins=0;
+      while(x<=b){if(rg){if(S.gleittage[x]){delete S.gleittage[x];n++;mins+=soll(x)}}else if(isWorkday(x)&&!S.gleittage[x]){S.gleittage[x]=true;delete S.urlaub[x];n++;mins+=soll(x)}x=addDays(x,1)}
+      toast((rg?"−":"+")+n+" Gleittage = "+hm(mins)+" h ("+de(a)+"–"+de(b)+")",true);
+    }else if(mode==="termin"){
+      while(x<=b){if(!S.wichtig[x]){S.wichtig[x]={titel:"Wichtiger Termin",von:"",bis:"",notiz:""};n++}x=addDays(x,1)}
+      toast(n+" Tage als wichtiger Termin markiert. Tippe einen Tag an, um Titel und Hinweis einzutragen.",true);
+    }else if(mode==="reset"){
+      while(x<=b){if(S.urlaub[x]||S.gleittage[x]||S.vertretung[x]||S.wichtig[x]){delete S.urlaub[x];delete S.gleittage[x];delete S.vertretung[x];delete S.wichtig[x];n++}x=addDays(x,1)}
+      toast(n+" Tage zurückgesetzt ("+de(a)+"–"+de(b)+")",true);
+    }else{var rem=!!S.vertretung[src];
+      while(x<=b){if(rem){if(S.vertretung[x]){delete S.vertretung[x];n++}}else if(isWorkday(x)){S.vertretung[x]=cover;n++}x=addDays(x,1)}
+      toast((rem?"−":"+")+n+" Vertretungstage ("+de(a)+"–"+de(b)+")",true);
+    }
+    save();render();return;
+  }
+  if(mode==="termin"){
+    if(!S.wichtig[d]){snapshot();S.wichtig[d]={titel:"Wichtiger Termin",von:"",bis:"",notiz:""};save();if(S.urlaub[d]||S.gleittage[d])toast("Achtung: an diesem Tag hast du frei",true)}
+    editing=d;render();setTimeout(function(){var e=$("wtTitel");if(e){e.focus();e.select()}},50);return;
+  }
+  if(mode==="reset"){
+    var orig=seed();
+    if(!S.urlaub[d]&&!S.gleittage[d]&&!S.vertretung[d]&&!S.wichtig[d]){toast(de(d,true)+": hier ist nichts eingetragen");renderDay();renderMonths();return}
+    snapshot();delete S.urlaub[d];delete S.gleittage[d];delete S.vertretung[d];delete S.wichtig[d];
+    toast(de(d,true)+" zurückgesetzt",true);save();render();return;
+  }
+  if(mode==="gleit"){
+    if(!S.gleittage[d]&&!isWorkday(d)){toast("Wochenende oder Feiertag: kein Gleittag nötig");renderDay();renderMonths();return}
+    snapshot();if(S.gleittage[d])delete S.gleittage[d];else{S.gleittage[d]=true;delete S.urlaub[d];toast("Gleittag: "+hm(soll(d))+" h von der Gleitzeit",true)}
+    save();render();return;
+  }
+  if(mode==="urlaub"){
+    if(!S.urlaub[d]&&!isWorkday(d)){toast(holiday(d)?holiday(d)+": kein Urlaubstag nötig":"Wochenende: kein Urlaubstag nötig");renderDay();renderMonths();return}
+    snapshot();var had=!!S.urlaub[d];setVac(d,!had);if(!had)delete S.gleittage[d];
+    if(!had&&S.vertretung[d])toast("Achtung: an diesem Tag vertrittst du "+S.vertretung[d],true);
+  }else{
+    if(!S.vertretung[d]&&!isWorkday(d)){toast("An Wochenenden und Feiertagen gibt es keine Vertretung");renderDay();renderMonths();return}
+    snapshot();
+    if(S.vertretung[d]){var was=S.vertretung[d];delete S.vertretung[d];toast(de(d,true)+": Vertretung für "+was+" zurückgesetzt",true)}
+    else{S.vertretung[d]=cover;if(S.urlaub[d])toast("Achtung: an diesem Tag hast du Urlaub",true)}
+  }
+  save();render();
+}
+function removeBlock(days,kind){snapshot();days.forEach(function(d){delete S[kind][d]});save();render();toast("Entfernt ("+days.length+" Tage)",true)}
+
+/* ---------- Darstellung ---------- */
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var todayIso=(function(){var t=new Date();return iso(t.getFullYear(),t.getMonth(),t.getDate())})();
+
+function renderMonths(){
+  var conf={};conflicts().forEach(function(d){conf[d]=1});
+  var sug=suggestions();
+  var h="";
+  viewMonths().forEach(function(vm){
+    var y=vm.y,m=vm.m,first=iso(y,m,1),len=new Date(Date.UTC(y,m+1,0)).getUTCDate(),off=(dow(first)+6)%7,cnt=0,other=y!==year;
+    for(var dd=1;dd<=Math.min(len,vm.cut);dd++){var s0=iso(y,m,dd);if(S.urlaub[s0]&&isWorkday(s0))cnt++}
+    h+='<section class="month'+(other?' other':'')+'" id="m'+y+'-'+m+'"><div class="mhead"><h3>'+MONTHS[m]+(other?' '+y:'')+'</h3><small>'+(cnt?'<b>'+cnt+'</b> Urlaubstag'+(cnt>1?'e':'')+(other?' · Konto '+y:''):(other?'zählt zum Konto '+y:''))+'</small></div><div class="grid">';
+    h+='<span></span>';["MO","DI","MI","DO","FR","SA","SO"].forEach(function(w,i){h+='<div class="wd'+(i>4?' we':'')+'">'+w+'</div>'});
+    h+='<span class="kw">'+kw(first)+'</span>';
+    for(var i=0;i<off;i++)h+='<span class="d empty"></span>';
+    for(var d=1;d<=len;d++){
+      var s=iso(y,m,d);
+      if(d>1&&dow(s)===1)h+='<span class="kw">'+kw(s)+'</span>';
+      if(d>vm.cut){h+='<span class="d out">'+d+'</span>';continue}
+      var cls=["d"],ft=S.optionen.ft!==false?holiday(s):null,we=isFree(s),ur=S.urlaub[s],vt=S.vertretung[s],
+          fn=S.optionen.nrw!==false?ferienAt(S.ferien.nrw,s):null,gt=S.gleittage[s],inner=String(d),lab=d+". "+MONTHS[m]+" "+y;
+      if(we)cls.push("we");if(ft)cls.push("ft");
+      if(vt&&!ur){cls.push("vt");inner+='<span class="ini">'+esc(vt.length>3?vt.split(/[\/+, ]/)[0]+"+":vt)+'</span>'}
+      if(ur)cls.push("ur");
+      if(gt&&!ur)cls.push("gt");
+      if(sug[s]&&S.optionen.vor!==false)cls.push("vor");
+      if(S.wichtig[s])cls.push("wt");
+      if(conf[s])cls.push("conf");
+      if(s===todayIso)cls.push("today");
+      if(s===selected)cls.push("sel");
+      if(s===anchor)cls.push("anchor");
+      if(fn)cls.push("fer");
+      if(ft)lab+=", "+ft;if(S.wichtig[s])lab+=", wichtiger Termin: "+S.wichtig[s].titel;if(ur)lab+=", Urlaub";if(gt)lab+=", Gleittag";if(sug[s])lab+=", Vorschlag: "+sug[s];if(vt)lab+=", Vertretung für "+vt;if(fn)lab+=", Schulferien NRW";
+      h+='<button class="'+cls.join(" ")+'" data-d="'+s+'" aria-label="'+esc(lab)+'">'+inner+'</button>';
+    }
+    h+='</div></section>';
+  });
+  $("months").innerHTML=h;
+}
+function renderKonto(){
+  var c=calc(year),k=c.k;
+  $("kontoYear").textContent=year;
+  $("konto").innerHTML=
+    '<div class="kz"><b>'+k.anspruch+'</b><span>Anspruch '+year+'</span></div>'+
+    '<div class="kz"><b>'+k.rest+'</b><span>Übertrag '+(year-1)+(k.vorjahrGeplant?' ('+k.stand+' − '+k.vorjahrGeplant+' Dez.)':'')+'</span></div>'+
+    '<div class="kz"><b>'+c.planned+'</b><span>verplant</span></div>'+
+    '<div class="kz '+(c.left<0?'neg':'pos')+'"><b>'+String(c.left).replace("-","−")+'</b><span>übrig</span></div>';
+  $("bigLine").innerHTML=c.left>=0?'Für das Jahr '+year+' verbleiben dir <b>'+c.left+'</b> Urlaubstag'+(c.left===1?'':'e'):'Für das Jahr '+year+' fehlen dir <b class="neg">'+(-c.left)+'</b> Urlaubstag'+(c.left===-1?'':'e');
+  var vr=viewRange(),inPlan=Object.keys(S.urlaub).filter(function(d){return inView(d)&&isWorkday(d)}),pre=inPlan.filter(function(d){return +d.slice(0,4)<year}).length,post=inPlan.filter(function(d){return +d.slice(0,4)>year}).length;
+  $("bigSub").innerHTML='<span>Im Plan eingetragen: <b>'+inPlan.length+'</b> Urlaubstage</span><span>davon zählen für '+year+': <b>'+c.planned+'</b></span>'+(pre?'<span>Dezember '+(year-1)+': <b>'+pre+'</b> (vom Rest '+(year-1)+' abgezogen, Übertrag: <b>'+c.k.rest+'</b>)</span>':'')+(post?'<span>Januar '+(year+1)+': <b>'+post+'</b> (Konto '+(year+1)+')</span>':'')+'<span>verfügbar '+year+': <b>'+c.available+'</b></span>';
+  $("calcWay").innerHTML=''+
+    (k.standDatum?'<div><span>Resturlaub '+(year-1)+' am '+de(k.standDatum,true)+'</span><span>'+k.stand+'</span></div>'+
+      '<div><span>− davon noch verplant bis Ende '+(year-1)+'</span><span>− '+k.vorjahrGeplant+'</span></div>'+
+      '<div class="tot"><span>= Übertrag nach '+year+' <small>(muss bis '+de(k.restBis,true)+' genommen werden)</small></span><span>'+k.rest+'</span></div><div style="height:6px"></div>':'')+
+    '<div><span>Urlaubsanspruch '+year+'</span><span>'+k.anspruch+'</span></div>'+
+    '<div><span>+ Übertrag <small>(zählt nur, soweit bis '+de(k.restBis,true)+' genommen: '+c.restUsed+' von '+k.rest+')</small></span><span>+ '+c.restUsed+'</span></div>'+
+    '<div class="tot"><span>= verfügbar</span><span>'+c.available+'</span></div>'+
+    '<div><span>− verplante Urlaubstage '+year+' <small>(Mo–Fr, ohne Feiertage)</small></span><span>− '+c.planned+'</span></div>'+
+    '<div class="tot"><span>= übrig</span><span>'+String(c.left).replace("-","−")+'</span></div>'+
+    (post?'<div><small>Nicht mitgezählt: '+post+' Tage im Januar '+(year+1)+', die gehen aufs Konto '+(year+1)+'.</small></div>':'');
+  var all=Object.keys(S.urlaub).filter(inView).sort(),byY={};
+  all.forEach(function(d){var y=d.slice(0,4);(byY[y]=byY[y]||[]).push(d)});
+  $("dayList").innerHTML=Object.keys(byY).sort().map(function(y){var ds=byY[y],cnt=0;
+    var rows=ds.map(function(d){var ok=isWorkday(d);if(ok)cnt++;return '<tr class="'+(ok?'':'nc')+'"><td>'+(ok?cnt:'–')+'</td><td>'+WD[dow(d)]+' '+de(d,true)+'</td><td>'+(ok?'zählt':'zählt nicht: '+(holiday(d)||'freier Wochentag'))+'</td></tr>'}).join("");
+    return '<h4>Konto '+y+(+y!==year?' (anderes Kalenderjahr)':'')+': '+cnt+' Urlaubstag'+(cnt===1?'':'e')+'</h4><table>'+rows+'</table>'}).join("")||'<p class="sub">Keine Urlaubstage eingetragen.</p>';
+  $("fabN").textContent=String(c.left).replace("-","−");$("fabN").className=c.left<0?"neg":"";
+  var tot=Math.max(c.available,c.planned)||1,inBudget=Math.min(c.planned,c.available),over=Math.max(0,c.planned-c.available);
+  $("bar").innerHTML='<i style="width:'+(inBudget/tot*100)+'%"></i><i class="over" style="width:'+(over/tot*100)+'%"></i>';
+  var note="Gezählt werden nur Montag bis Freitag ohne NRW-Feiertage.";
+  if(k.rest)note+=" Übertrag "+(year-1)+": "+c.restUsed+" von "+k.rest+" bis "+de(k.restBis,true)+" genutzt.";
+  $("kontoNote").textContent=note;
+  var r=viewRange(),edge=[];
+  [year-1,year+1].forEach(function(oy){
+    var ds=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===oy&&inView(d)&&isWorkday(d)});
+    var from=oy<year?r[0]:iso(oy,0,1),to=oy<year?iso(oy,11,31):r[1];
+    if(from>to)return;
+    edge.push('<div class="edge"><span>'+de(from)+'–'+de(to,true)+'</span><b>'+ds.length+' Tag'+(ds.length===1?'':'e')+'</b><small>zählt zum Konto '+oy+'</small></div>');
+  });
+  $("edges").innerHTML=edge.join("");
+  var g=gleitCalc(),mx=(S.gleitMax||32)*60;
+  if(!g.last){$("gzNow").innerHTML='<small>Noch kein Stand eingetragen. Trage deinen aktuellen Gleitzeitstand ein.</small>'}
+  else{$("gzNow").innerHTML='<b class="'+(g.last.min>mx||g.last.min<0?'neg':'')+'">'+hm(g.last.min)+' h</b><small>Stand '+de(g.last.datum,true)+' · Höchstwert '+(S.gleitMax||32)+' h</small>'+
+    (g.future.length?'<small style="width:100%">Nach '+g.future.length+' geplanten Gleittag'+(g.future.length>1?'en':'')+' ('+hm(g.need)+' h): <b style="font-size:16px" class="'+(g.rest<0?'neg':'')+'">'+hm(g.rest)+' h</b></small>':'')}
+  $("gzHist").innerHTML=g.hist.slice(-5).reverse().map(function(e){return '<li>'+de(e.datum,true)+': '+hm(e.min)+' h</li>'}).join("");
+}
+function renderWarns(){
+  var c=calc(year),items=[];
+  if(c.left<0)items.push({t:"Konto überzogen: "+c.planned+" Tage verplant, "+c.available+" verfügbar. Es fehlen "+(-c.left)+" Tage.",m:null,view:"konto"});
+  if(c.k.vorjahrMinus>0)items.push({t:"Im Dezember "+(year-1)+" hast du "+c.k.vorjahrMinus+" Urlaubstag"+(c.k.vorjahrMinus>1?"e":"")+" mehr verplant, als du "+(year-1)+" noch übrig hast ("+c.k.stand+")."});
+  if(c.restLost>0)items.push({t:c.restLost+" Resttag"+(c.restLost>1?"e":"")+" aus "+(year-1)+" verfallen am "+de(c.k.restBis,true)+", wenn du davor keinen Urlaub einträgst.",m:null,info:true});
+  conflicts().forEach(function(d){var what=S.urlaub[d]?"Urlaub":"Gleittag";
+    if(S.vertretung[d])items.push({t:WDL[dow(d)]+", "+de(d,true)+": "+what+", aber du vertrittst "+S.vertretung[d]+".",d:d});
+    if(S.wichtig[d])items.push({t:WDL[dow(d)]+", "+de(d,true)+": "+what+", aber wichtiger Termin „"+S.wichtig[d].titel+"“.",d:d})});
+
+  var open=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===year&&S.urlaub[d]==="NN"}).length;
+  if(open)items.push({t:"Bei "+open+" Urlaubstagen ist deine Vertretung noch offen (NN).",m:null,info:true});
+  var g=gleitCalc(),mx=(S.gleitMax||32)*60;
+  if(g.last&&g.last.min>mx)items.push({t:"Gleitzeit über dem Höchstwert: "+hm(g.last.min)+" h von maximal "+(S.gleitMax||32)+" h. Ein Gleittag baut "+hm(soll("2027-01-04"))+" h (Mo–Do) bzw. "+hm(soll("2027-01-08"))+" h (Fr) ab."});
+  if(g.last&&g.future.length&&g.rest<0)items.push({t:"Für die geplanten Gleittage fehlen "+hm(-g.rest)+" h Gleitzeit."});
+  if(!g.last&&Object.keys(S.gleittage).length)items.push({t:"Trage deinen Gleitzeitstand ein, damit die Gleittage verrechnet werden.",info:true});
+  var sg=suggestions(),sk=Object.keys(sg).filter(function(d){return +d.slice(0,4)===year}).sort();
+  if(sk.length){var byName={};sk.forEach(function(d){(byName[sg[d]]=byName[sg[d]]||[]).push(d)});
+    Object.keys(byName).forEach(function(nm){var ds=byName[nm];items.push({t:"Vorschlag „"+nm+"“: "+ds.length+" Tag"+(ds.length>1?"e":"")+" noch nicht eingetragen ("+ds.slice(0,3).map(function(d){return WD[dow(d)]+" "+de(d)}).join(", ")+(ds.length>3?" …":"")+").",info:true,d:ds[0]})})}
+  var nx=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===year+1&&inView(d)&&isWorkday(d)}).length;
+  if(nx)items.push({t:nx+" Urlaubstag"+(nx>1?"e":"")+" im Januar "+(year+1)+" gehen aufs Konto "+(year+1)+".",info:true});
+  var serious=items.filter(function(i){return !i.info}).length;
+  $("warnSum").innerHTML='Hinweise '+(serious?'<span class="wcount">'+serious+' wichtig</span>':'')+(items.length-serious?'<span class="wcount info">'+(items.length-serious)+' Info</span>':'');
+  if(!items.length){$("warns").innerHTML='<div class="okmsg">Alles im grünen Bereich.</div>';return}
+  $("warns").innerHTML='<ul class="warns">'+items.map(function(it){return '<li class="'+(it.info?'info':'')+'">'+esc(it.t)+(it.d?' <button data-go="'+it.d+'">Anzeigen</button>':'')+(it.view?' <button data-view="konto">Kürzungshelfer öffnen</button>':'')+'</li>'}).join("")+'</ul>';
+}
+function renderDay(){
+  var d=selected;$("dayCard").hidden=!d||view!=="kalender";if(!d){return}
+  var tags=[],ft=holiday(d),fn=ferienAt(S.ferien.nrw,d);
+  if(ft)tags.push(["Feiertag: "+ft,"var(--feiertag)","var(--feiertag-fg)"]);
+  if(S.urlaub[d])tags.push(["Urlaub · Vertretung "+S.urlaub[d],"var(--urlaub)","var(--urlaub-fg)"]);
+  if(S.gleittage[d])tags.push(["Gleittag · "+hm(soll(d))+" h","var(--gleit)","var(--gleit-fg)"]);
+  if(S.vertretung[d])tags.push(["Ich vertrete "+S.vertretung[d],"var(--vertr)","var(--vertr-fg)"]);
+  var W=S.wichtig[d];
+  var tn=terminAt(d);if(tn)tags.push(["Fester Termin: "+tn,"var(--vor-bg)","var(--fg)"]);
+  if(fn)tags.push(["Schulferien NRW: "+fn,"var(--ferien)","#2a2100"]);
+  if(isWeekend(d))tags.push(["Wochenende","var(--we-bg)","var(--we)"]);
+  $("dayInfo").innerHTML='<b>'+WDL[dow(d)]+', '+de(d,true)+'</b> <span class="sub">KW '+kw(d)+(soll(d)&&isWorkday(d)?' · Soll '+hm(soll(d))+' h':'')+'</span><div class="tags">'+
+    (tags.length?tags.map(function(t){return '<span class="tag" style="background:'+t[1]+';color:'+t[2]+'">'+esc(t[0])+'</span>'}).join(""):(W?'':'<span class="sub">Normaler Arbeitstag</span>'))+'</div>'+
+    (W&&editing!==d?'<div class="wtbox"><span class="wtico"></span><div><b>'+esc(W.titel)+'</b>'+(W.von?'<span class="sub"> · '+esc(W.von)+(W.bis?'–'+esc(W.bis):'')+' Uhr</span>':'')+(W.notiz?'<p class="wtnote">'+esc(W.notiz).replace(/\n/g,"<br>")+'</p>':'<p class="wtnote sub">Kein Hinweis eingetragen.</p>')+'<div class="dacts"><button class="btn sm" data-wedit="1">Bearbeiten</button><button class="btn sm" data-unset="wichtig">Termin löschen</button></div></div></div>':'')+
+    (W&&editing===d?'<form class="wtform" id="wtForm"><label>Titel<input id="wtTitel" type="text" value="'+esc(W.titel)+'"></label><div class="wtt"><label>von<input id="wtVon" type="time" value="'+esc(W.von)+'"></label><label>bis<input id="wtBis" type="time" value="'+esc(W.bis)+'"></label></div><label>Hinweis<textarea id="wtNotiz" rows="3" placeholder="z. B. Raum, Unterlagen, wer vorbereitet">'+esc(W.notiz)+'</textarea></label><div class="dacts"><button class="btn sm primary" type="submit">Speichern</button><button class="btn sm" type="button" data-wcancel="1">Abbrechen</button><button class="btn sm" type="button" data-unset="wichtig">Termin löschen</button></div></form>':'')+
+    (S.urlaub[d]?'<div class="dsub">Wer vertritt mich?'+["NN"].concat(S.team).map(function(o){return '<button class="chip ur" data-dsub="'+esc(o)+'" aria-pressed="'+(S.urlaub[d]===o)+'">'+esc(o)+'</button>'}).join("")+'</div>':'')+
+    ((S.urlaub[d]||S.gleittage[d]||S.vertretung[d])?'<div class="dacts">'+
+      (S.vertretung[d]?'<button class="btn sm" data-unset="vertretung">Vertretung zurücksetzen</button>':'')+
+      (S.urlaub[d]?'<button class="btn sm" data-unset="urlaub">Urlaub entfernen</button>':'')+
+      (S.gleittage[d]?'<button class="btn sm" data-unset="gleittage">Gleittag entfernen</button>':'')+
+      ((S.urlaub[d]?1:0)+(S.gleittage[d]?1:0)+(S.vertretung[d]?1:0)+(W?1:0)>1?'<button class="btn sm" data-unset="all">Tag zurücksetzen</button>':'')+'</div>':'');
+}
+var IC={
+ urlaub:'<svg viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12.5h17"/></svg>',
+ feiertag:'<svg viewBox="0 0 24 24"><path d="M12 3.5l2.4 5 5.4.6-4 3.7 1.1 5.4L12 15.5l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6z"/></svg>',
+ ferien:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
+ vertr:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.3c2.6-.4 5 1.2 5.6 4.2"/></svg>',
+ bruecke:'<svg viewBox="0 0 24 24"><path d="M2.5 15.5h19M4.5 15.5v4M19.5 15.5v4M4.5 15.5c2-5 13-5 15 0M9 12.6v2.9M15 12.6v2.9M12 11.8v3.7"/></svg>',
+ termin:'<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2.5"/><path d="M9 12l2 2 4-4"/></svg>',
+ gleit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>',
+ next:'<svg viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5v2"/><circle cx="17.5" cy="17.5" r="3.5" fill="var(--surface)"/><path d="M17.5 16v1.6l1 .7"/></svg>'};
+function daysUntil(d){return Math.round((parse(d)-parse(todayIso))/864e5)}
+function bridges(){var out=[],r=viewRange();[year-1,year,year+1].forEach(function(y){var h=holidays(y);Object.keys(h).forEach(function(d){
+  var w=dow(d),br=w===4?addDays(d,1):w===2?addDays(d,-1):null;if(br&&inView(br)&&isWorkday(br))out.push({d:br,after:h[d]})})});return out}
+function rangeTxt(a,b){return WD[dow(a)]+' '+de(a,a.slice(0,4)!=year)+(b!==a?' – '+WD[dow(b)]+' '+de(b,b.slice(0,4)!=year):'')}
+function renderTimeline(bl,cg){
+  var items=[],r=viewRange(),past=$("fPast").checked,tnames={};
+  terminInstances().forEach(function(i){i.days.forEach(function(d){tnames[d]=i.t.name})});
+  bl.forEach(function(b,i){var nm=null;b.days.some(function(d){return nm=tnames[d]});
+    items.push({d:b.from,to:b.to,k:"urlaub",t:nm||"Urlaub",sub:rangeTxt(b.from,b.to)+' · '+freeSpan(b.days).n+' freie Tage am Stück · Vertretung '+b.subs,
+      n:b.n,nl:(Object.keys(b.perYear).length>1?Object.keys(b.perYear).sort().map(function(y){return b.perYear[y]+"×"+y}).join(" + "):"Urlaubstag"+(b.n===1?"":"e")),act:'<button class="x" data-rmb="'+i+'" aria-label="Urlaub entfernen">×</button>',
+      extra:'<label class="tsub">Vertretung für den ganzen Zeitraum <select data-bsub="'+i+'">'+["NN"].concat(S.team).concat(b.subs.indexOf(",")>=0?["gemischt"]:[]).map(function(o){var cur=b.subs.indexOf(",")>=0?"gemischt":b.subs;return '<option'+(o===cur?' selected':'')+(o==="gemischt"?' disabled':'')+'>'+esc(o)+'</option>'}).join("")+'</select></label>'})});
+  cg.forEach(function(b,i){items.push({d:b.from,to:b.to,k:"vertr",t:"Ich vertrete "+b.who,sub:rangeTxt(b.from,b.to),n:b.days.length,nl:"Tag"+(b.days.length===1?"":"e"),act:'<button class="x" data-rmc="'+i+'" aria-label="Vertretung entfernen">×</button>'})});
+  Object.keys(S.wichtig).filter(inView).forEach(function(d){var W=S.wichtig[d];items.push({d:d,to:d,k:"termin",t:W.titel,sub:WDL[dow(d)]+(W.von?' · '+W.von+(W.bis?'–'+W.bis:'')+' Uhr':'')+(W.notiz?' · '+W.notiz:''),n:null})});
+  var gd=Object.keys(S.gleittage).filter(inView).sort();gd.forEach(function(d){items.push({d:d,to:d,k:"gleit",t:"Gleittag",sub:WDL[dow(d)]+' · '+hm(soll(d))+' h Gleitzeit',n:null})});
+  bridges().forEach(function(x){var done=S.urlaub[x.d]||S.gleittage[x.d];items.push({d:x.d,to:x.d,k:"bruecke",t:done?"Brückentag eingeplant":"Brückentag möglich",sub:WDL[dow(x.d)]+' '+de(x.d,true)+' nach '+x.after+(done?' ✓':' · 1 Urlaubstag schenkt dir 4 freie Tage'),n:null,soft:!done})});
+  if($("fFt").checked)[year-1,year,year+1].forEach(function(y){var h=holidays(y);Object.keys(h).forEach(function(d){if(inView(d))items.push({d:d,to:d,k:"feiertag",t:h[d],sub:WDL[dow(d)]+(isWeekend(d)?' · fällt aufs Wochenende':''),n:null,soft:true})})});
+  if($("fFe").checked){S.ferien.nrw.forEach(function(f){if(f[1]>=r[0]&&f[0]<=r[1])items.push({d:f[0],to:f[1],k:"ferien",t:"NRW-"+f[2],sub:rangeTxt(f[0],f[1]),n:null,soft:true})});
+  }
+  var order={ferien:0,feiertag:2,termin:3,urlaub:4,gleit:5,bruecke:6,vertr:7};
+  items.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:order[a.k]-order[b.k]});
+  if(!past)items=items.filter(function(i){return i.to>=todayIso});
+  var h="",lastM="";
+  items.forEach(function(it){var mk=it.d.slice(0,7);if(mk!==lastM){lastM=mk;h+='<h3 class="tlm"><span>'+MONTHS[+mk.slice(5,7)-1]+' '+mk.slice(0,4)+'</span></h3>'}
+    var p=it.d.split("-");
+    h+='<div class="tli k-'+it.k+(it.soft?' soft':'')+'"><span class="tdate"><b>'+(+p[2])+'</b><small>'+WD[dow(it.d)]+'</small></span><span class="tic">'+IC[it.k]+'</span><span class="ttx"><b>'+esc(it.t)+'</b><small>'+esc(it.sub)+'</small>'+(it.extra||'')+'</span>'+
+      (it.n!==null?'<span class="tn"><b>'+it.n+'</b><small>'+esc(it.nl)+'</small></span>':'<span></span>')+(it.act||'<span></span>')+'</div>'});
+  $("timeline").innerHTML=h||'<div class="sub">Für diesen Zeitraum ist nichts eingetragen.</div>';
+  var nx=bl.filter(function(b){return b.to>=todayIso})[0];
+  if(nx){var du=daysUntil(nx.from),nm=null;nx.days.some(function(d){return nm=tnames[d]});
+    $("nextCard").innerHTML='<span class="tic big">'+IC.next+'</span><span><b class="nt">'+(du<=0?'Du bist im Urlaub!':'Nächster Urlaub in '+du+' Tag'+(du===1?'':'en'))+'</b><span class="ns">'+esc(nm||"Urlaub")+' · '+rangeTxt(nx.from,nx.to)+' · '+nx.n+' Urlaubstag'+(nx.n===1?'':'e')+'</span></span>'}
+  else $("nextCard").innerHTML='<span class="tic big">'+IC.next+'</span><span><b class="nt">Kein anstehender Urlaub</b><span class="ns">Zeit, etwas zu planen! Tippe im Kalender auf „Urlaub“.</span></span>';
+}
+function freeSpan(days){var set={};days.forEach(function(d){set[d]=1});
+  function off(x){return set[x]||!isWorkday(x)||S.urlaub[x]||S.gleittage[x]}
+  var x=addDays(days[0],-21),end=addDays(days[days.length-1],21),best={n:0,a:days[0],z:days[0]},runA=null,hit=false;
+  while(x<=end){if(off(x)){if(!runA){runA=x;hit=false}if(set[x])hit=true}else{if(runA&&hit){var n=Math.round((parse(x)-parse(runA))/864e5);if(n>best.n)best={n:n,a:runA,z:addDays(x,-1)}}runA=null}x=addDays(x,1)}
+  if(runA&&hit){var n2=Math.round((parse(x)-parse(runA))/864e5);if(n2>best.n)best={n:n2,a:runA,z:addDays(x,-1)}}
+  return best}
+function weekKey(d){return addDays(d,-((dow(d)+6)%7))}
+function cutOptions(){var out=[];
+  blocks().forEach(function(b){var wd=b.days.filter(function(d){return isWorkday(d)&&+d.slice(0,4)===year});if(!wd.length)return;
+    var weeks=[];wd.forEach(function(d){var k=weekKey(d);if(!weeks.length||weeks[weeks.length-1].k!==k)weeks.push({k:k,days:[]});weeks[weeks.length-1].days.push(d)});
+    var name=b.name||"Urlaub",cands=[];
+    if(weeks.length>1){cands.push({label:name+": erste Woche weglassen",days:weeks[0].days});cands.push({label:name+": letzte Woche weglassen",days:weeks[weeks.length-1].days})}
+    if(wd.length>1&&wd.length<=2)cands.push({label:name+": "+(wd.length===1?"Tag":"beide Tage")+" streichen",days:wd});
+    if(weeks.length===1&&wd.length>2){cands.push({label:name+": ersten Tag weglassen",days:[wd[0]]});cands.push({label:name+": letzten Tag weglassen",days:[wd[wd.length-1]]})}
+    if(wd.length===1)cands.push({label:name+": streichen",days:wd});
+    cands.forEach(function(c){var rest=b.days.filter(function(d){return c.days.indexOf(d)<0});
+      var bef=freeSpan(b.days).n,aft=0;if(rest.length){var save={};c.days.forEach(function(d){save[d]=S.urlaub[d];delete S.urlaub[d]});aft=freeSpan(rest).n;c.days.forEach(function(d){S.urlaub[d]=save[d]})}
+      out.push({label:c.label,days:c.days,save:c.days.length,before:bef,after:aft,block:b})})});
+  return out}
+function renderCut(){var c=calc(year),ops=cutOptions(),bl=blocks().filter(function(b){return b.days.some(function(d){return +d.slice(0,4)===year})});
+  var h='<div class="effs">'+bl.map(function(b){var fs=freeSpan(b.days),n=b.days.filter(function(d){return isWorkday(d)&&+d.slice(0,4)===year}).length;
+    return '<div class="eff"><b>'+esc(b.name||"Urlaub")+'</b><span>'+rangeTxt(b.from,b.to)+'</span><span class="effn"><em>'+n+'</em> Urlaubstage → <em>'+fs.n+'</em> freie Tage am Stück</span><span class="effq">'+(n?(fs.n/n).toFixed(1).replace(".",","):"–")+' freie Tage je Urlaubstag</span></div>'}).join("")+'</div>';
+  if(c.left<0){h+='<p class="cutlead">Dir fehlen <b>'+(-c.left)+'</b> Tage. Hier sind die Kürzungen, die dich am wenigsten freie Zeit kosten, zuerst. Du siehst jeweils, wie viele Tage du sparst und wie lang deine Auszeit danach noch ist:</p>';}
+  else h+='<p class="cutlead">Dein Konto reicht. Falls du trotzdem Tage zurückhalten willst, findest du hier die Möglichkeiten:</p>';
+  var idx=ops.map(function(o,i){o.i=i;return o}).sort(function(a,b){return ((a.before-a.after)/a.save)-((b.before-b.after)/b.save)||b.save-a.save});
+  h+='<ul class="cuts">'+idx.map(function(o){var nl=c.left+o.save;return '<li><span class="cl"><b>'+esc(o.label)+'</b><small>'+o.days.map(function(d){return WD[dow(d)]+" "+de(d)}).join(", ")+'</small></span>'+
+    '<span class="cs"><b>+'+o.save+'</b><small>Tage</small></span><span class="cs"><b>'+(o.after?o.after:"–")+'</b><small>'+(o.after?'statt '+o.before+' frei':'Reise fällt weg')+'</small></span>'+
+    '<span class="cs"><b class="'+(nl<0?'neg':'okc')+'">'+String(nl).replace("-","−")+'</b><small>übrig danach</small></span><button class="btn sm" data-cut="'+o.i+'">Übernehmen</button></li>'}).join("")+'</ul>';
+  $("cutBox").innerHTML=h}
+function renderLists(){var _r=viewRange();if($("expRange"))$("expRange").textContent="("+de(_r[0],true)+" bis "+de(_r[1],true)+")";
+  document.querySelectorAll(".bzY").forEach(function(e){e.textContent=year});document.querySelectorAll(".bzY2").forEach(function(e){e.textContent=year+1});
+  var bl=blocks(),cg=coverGroups();renderTimeline(bl,cg);
+  renderLists.bl=bl;renderLists.cg=cg;
+  var inst=terminInstances(),byT={};inst.forEach(function(i){(byT[i.t.id]=byT[i.t.id]||[]).push(i)});
+  $("termine").innerHTML=(S.termine||[]).map(function(t,ti){
+    var is=byT[t.id]||[],when=is.length?is.map(function(i){return de(i.from,true)+"–"+de(i.to,true)+" · "+i.done+"/"+i.days.length+" Urlaubstage eingetragen"}).join("<br>"):"Im Plan "+year+" keine Daten (Ferientermine fehlen?)";
+    var missing=is.reduce(function(a,i){return a+(i.days.length-i.done)},0);
+    return '<li class="'+(t.aktiv?'':'off')+'"><span class="dot" style="background:var(--urlaub)"></span><span><b>'+esc(t.name)+'</b></span><span class="acts">'+
+      (missing&&t.aktiv?'<button class="btn" data-tbook="'+ti+'">Eintragen ('+missing+')</button>':'')+
+      '<button class="btn" data-ttog="'+ti+'" aria-pressed="'+t.aktiv+'">'+(t.aktiv?'Aus':'An')+'</button><button class="x" data-tdel="'+ti+'" aria-label="Termin löschen">×</button></span>'+
+      '<span class="meta">'+esc(ruleText(t))+'<br>'+when+'</span></li>'}).join("")||'<li class="sub">Keine festen Termine.</li>';
+}
+function renderTools(){
+  document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.mode===mode))});
+  $("urlaubOpts").hidden=mode!=="urlaub";$("vertrOpts").hidden=mode!=="vertr";
+  $("subChips").innerHTML=["NN"].concat(S.team).map(function(t){return '<button class="chip ur" data-sub="'+esc(t)+'" aria-pressed="'+(t===sub)+'">'+esc(t)+'</button>'}).join("");
+  var opts=S.team.slice();if(S.team.length>1)opts.push(S.team[0]+"/"+S.team[S.team.length-1]);
+  if(opts.indexOf(cover)<0)opts.push(cover);
+  $("coverChips").innerHTML=opts.map(function(t){return '<button class="chip vt" data-cover="'+esc(t)+'" aria-pressed="'+(t===cover)+'">'+esc(t)+'</button>'}).join("")+
+    '<button class="chip" id="coverOther">Andere …</button>';
+  $("rangeMode").checked=rangeOn;$("rangeMode").disabled=mode==="view";
+  hint();
+}
+function hint(){
+  var t,act=false;
+  if(mode==="view")t="Tippen zeigt nur die Details. Nichts wird verändert.";
+  else if(rangeOn){act=true;t=anchor?"Anfang "+de(anchor,true)+" gewählt. Jetzt das Ende antippen.":"Tippe auf den ersten Tag des Zeitraums."}
+  else if(mode==="termin")t="Tippen markiert einen wichtigen Termin (Quadrat). Danach kannst du Titel, Uhrzeit und Hinweis eintragen.";
+  else if(mode==="reset")t="Tippen löscht alles, was du an diesem Tag eingetragen hast (Urlaub, Gleittag, Vertretung). Der Tag sieht dann aus wie ein normaler Kalendertag.";
+  else if(mode==="gleit")t="Tippen setzt oder entfernt einen Gleittag (Mo–Do "+hm(S.arbeitszeit[1])+" h, Fr "+hm(S.arbeitszeit[5])+" h).";
+  else t=mode==="urlaub"?"Tippen setzt oder entfernt einen Urlaubstag.":"Tippen auf einen leeren Tag setzt eine Vertretung für "+cover+". Tippen auf einen schwarzen Tag setzt ihn zurück.";
+  $("modeHint").textContent=t;$("modeHint").className="hint"+(act?" active":"");
+}
+function renderSettings(){
+  var k=konto(year);$("setYear1").textContent=year;$("sAnspruch").value=k.anspruch;$("sRest").value=k.stand;$("sRestBis").value=k.restBis;$("sTeam").value=S.team.join(", ");$("sFrei").value=(S.freieTage||[]).map(function(md){return md.split("-").reverse().join(".")+"."}).join(", ");$("sAzMoDo").value=hm(S.arbeitszeit[1]);$("sAzFr").value=hm(S.arbeitszeit[5]);$("sGzMax").value=S.gleitMax||32;$("sVor").value=String(ansicht().vorlauf);$("sNach").value=String(ansicht().nachlauf);
+}
+function render(){try{renderCut()}catch(e){console.error(e)}
+$("yearLbl").textContent=year;var vr=viewRange();$("planSub").textContent="Plan "+year+" · "+de(vr[0],true)+" bis "+de(vr[1],true);renderKonto();renderTools();renderWarns();renderMonths();renderDay();renderLists();renderSettings()}
+
+var tT;
+function toast(msg,withUndo){$("toastMsg").textContent=msg;$("toastUndo").hidden=!withUndo;$("toast").hidden=false;clearTimeout(tT);tT=setTimeout(function(){$("toast").hidden=true},4000)}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button,[data-d]");if(!t)return;
+  if(t.dataset.d){tapDay(t.dataset.d);return}
+  if(t.dataset.view){showView(t.dataset.view);return}
+  if(t.id==="fab"){showView("konto");return}
+  if(t.id==="dayClose"){selected=null;editing=null;renderDay();renderMonths();return}
+  if(t.dataset.mode){mode=t.dataset.mode;anchor=null;renderTools();renderMonths();return}
+  if(t.dataset.sub){sub=t.dataset.sub;renderTools();return}
+  if(t.dataset.cover){cover=t.dataset.cover;renderTools();return}
+  if(t.id==="coverOther"){var w=document.createElement("input");w.className="chip";w.placeholder="Kürzel";w.style.width="90px";w.setAttribute("autocapitalize","characters");
+    t.replaceWith(w);w.focus();w.addEventListener("change",function(){var v=w.value.trim().toUpperCase();if(v){cover=v}renderTools()});return}
+  if(t.dataset.go){if(view!=="kalender")showView("kalender");var d=t.dataset.go;selected=d;renderDay();renderMonths();var el=$("m"+(+d.slice(0,4))+"-"+(+d.slice(5,7)-1));if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
+  if(t.dataset.dsub&&selected&&S.urlaub[selected]){snapshot();S.urlaub[selected]=t.dataset.dsub;save();render();toast(de(selected,true)+": Vertretung "+t.dataset.dsub,true);return}
+  if(t.dataset.unset&&selected){var dd=selected,k=t.dataset.unset;snapshot();
+    if(k==="all"){delete S.urlaub[dd];delete S.gleittage[dd];delete S.vertretung[dd];delete S.wichtig[dd]}else delete S[k][dd];editing=null;
+    save();render();toast(de(dd,true)+(k==="all"?" zurückgesetzt":k==="vertretung"?": Vertretung entfernt":k==="urlaub"?": Urlaub entfernt":k==="wichtig"?": Termin gelöscht":": Gleittag entfernt"),true);return}
+  if(t.dataset.wedit){editing=selected;renderDay();setTimeout(function(){var e=$("wtTitel");if(e)e.focus()},50);return}
+  if(t.dataset.wcancel){editing=null;renderDay();return}
+  if(t.dataset.cut!==undefined){var op=cutOptions()[+t.dataset.cut];if(!op)return;snapshot();op.days.forEach(function(x){delete S.urlaub[x]});save();render();toast(op.label+": "+op.save+" Tage frei geworden",true);return}
+  if(t.dataset.tbook!==undefined){var tt=S.termine[+t.dataset.tbook],n=0;snapshot();terminInstances().forEach(function(i){if(i.t.id!==tt.id)return;i.days.forEach(function(d){if(!S.urlaub[d]){S.urlaub[d]=sub;delete S.gleittage[d];n++}})});save();render();toast("„"+tt.name+"“: "+n+" Urlaubstage eingetragen",true);return}
+  if(t.dataset.ttog!==undefined){snapshot();var t2=S.termine[+t.dataset.ttog];t2.aktiv=!t2.aktiv;save();render();return}
+  if(t.dataset.tdel!==undefined){var i3=+t.dataset.tdel;if(t.dataset.armed!=="1"){t.dataset.armed="1";t.textContent="?";t.setAttribute("aria-label","Zum Löschen nochmal tippen");setTimeout(function(){if(t.isConnected){t.dataset.armed="";t.textContent="×"}},3000);return}
+    snapshot();var del=S.termine.splice(i3,1)[0];save();render();toast("„"+del.name+"“ gelöscht",true);return}
+  if(t.dataset.rmb!==undefined){removeBlock(renderLists.bl[+t.dataset.rmb].days,"urlaub");return}
+  if(t.dataset.rmc!==undefined){removeBlock(renderLists.cg[+t.dataset.rmc].days,"vertretung");return}
+});
+["fFt","fFe","fPast"].forEach(function(id){$(id).addEventListener("change",renderLists)});
+function renderLegend(){
+  var L=["M","D","M","D","F","S","S"];
+  $("wdWork").innerHTML=L.map(function(l,i){var w=(i+1)%7;return '<button data-wd="'+w+'" aria-pressed="'+(S.arbeitstage.indexOf(w)>=0)+'" aria-label="'+WDL[w]+'">'+l+'</button>'}).join("");
+  $("tShowFt").checked=S.optionen.ft!==false;$("tNrw").checked=S.optionen.nrw!==false;$("tVor").checked=S.optionen.vor!==false;
+}
+function openLegend(){renderLegend();$("legend").hidden=false;$("legScrim").hidden=false;$("legOpen").setAttribute("aria-expanded","true");$("legClose").focus()}
+function closeLegend(){$("legend").hidden=true;$("legScrim").hidden=true;$("legOpen").setAttribute("aria-expanded","false")}
+$("legOpen").addEventListener("click",openLegend);$("legOpen2").addEventListener("click",openLegend);
+$("legClose").addEventListener("click",closeLegend);$("legScrim").addEventListener("click",closeLegend);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("legend").hidden)closeLegend()});
+(function(){var x0=null,y0=null;
+  $("legend").addEventListener("touchstart",function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  $("legend").addEventListener("touchend",function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;if(dx<-60&&Math.abs(dy)<Math.abs(dx))closeLegend();x0=null},{passive:true});
+  document.addEventListener("touchstart",function(e){var t=e.touches[0];if(t.clientX<24&&$("legend").hidden){x0=t.clientX;y0=t.clientY;document.addEventListener("touchend",function f(ev){document.removeEventListener("touchend",f);var c=ev.changedTouches[0];if(c.clientX-x0>70&&Math.abs(c.clientY-y0)<60)openLegend();x0=null},{passive:true})}},{passive:true});
+})();
+$("legend").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.dataset.wd){var w=+b.dataset.wd,i=S.arbeitstage.indexOf(w);snapshot();if(i>=0)S.arbeitstage.splice(i,1);else S.arbeitstage.push(w);S.arbeitstage.sort();save();render();renderLegend();toast("Arbeitstage geändert. Das Konto rechnet jetzt damit.",true)}
+  if(b.dataset.ho){var h=+b.dataset.ho,j=S.homeoffice.indexOf(h);if(j>=0)S.homeoffice.splice(j,1);else S.homeoffice.push(h);S.homeoffice.sort();save();render();renderLegend()}
+  e.stopPropagation()});
+[["tShowFt","ft"],["tNrw","nrw"],["tVor","vor"]].forEach(function(p){$(p[0]).addEventListener("change",function(){S.optionen[p[1]]=this.checked;save();render()})});
+$("gzSave").addEventListener("click",function(){var v=parseHM($("gzInput").value);if(v===null){toast("Bitte als Stunden eingeben, z. B. 14:30 oder 14,5");return}
+  snapshot();S.gleitzeit=S.gleitzeit.filter(function(e){return e.datum!==todayIso});S.gleitzeit.push({datum:todayIso,min:v});$("gzInput").value="";save();render();
+  toast("Gleitzeit "+hm(v)+" h eingetragen"+(v>(S.gleitMax||32)*60?". Achtung: über dem Höchstwert":""),true)});
+function syncTadd(){var a=$("tArt").value;document.querySelectorAll(".tadd [data-for]").forEach(function(l){l.hidden=l.dataset.for!==a})}
+$("tArt").addEventListener("change",syncTadd);
+function ddmm(t){var m=String(t||"").trim().match(/^(\d{1,2})\.(\d{1,2})\.?$/);if(!m)return null;var d=+m[1],mo=+m[2];if(mo<1||mo>12||d<1||d>31)return null;return String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0")}
+$("tAdd").addEventListener("click",function(){
+  var nm=$("tName").value.trim(),a=$("tArt").value,t={id:"t"+Date.now(),name:nm,art:a,aktiv:true};
+  if(!nm){toast("Bitte gib dem Termin einen Namen.");return}
+  if(a==="fest"){t.von=ddmm($("tVon").value);t.bis=ddmm($("tBis").value)||t.von;if(!t.von){toast("Bitte das Datum als TT.MM. eingeben, z. B. 24.12.");return}}
+  if(a==="feiertag"){t.feiertag=$("tFt").value;t.bis=$("tFtBis").value}
+  if(a==="ferien"){t.ferien=$("tFe").value;t.vers=Math.max(0,+$("tVers").value||0);t.dauer=Math.max(0,+$("tDauer").value||0)}
+  snapshot();S.termine.push(t);save();render();$("tName").value="";$("tVon").value="";$("tBis").value="";$("taddBox").open=false;toast("Termin „"+nm+"“ gespeichert",true)});
+(function(){var h=holidays(2027);$("tFt").innerHTML=Object.keys(h).map(function(d){return '<option>'+h[d]+'</option>'}).join("")})();
+/* ---------- Startabfrage ---------- */
+function showSetup(){var k=konto(year);document.querySelectorAll(".suY1").forEach(function(e){e.textContent=year-1});document.querySelectorAll(".suY2").forEach(function(e){e.textContent=year});
+  $("suRest").value=S.konten[String(year)]?k.stand:"";$("suAnspruch").value=k.anspruch||30;var g=gleitCalc();$("suGz").value=g.last?hm(g.last.min):"";$("suErr").hidden=true;$("setup").hidden=false;setTimeout(function(){$("suRest").focus()},50)}
+$("setupForm").addEventListener("submit",function(e){e.preventDefault();
+  var r=$("suRest").value.trim(),an=+$("suAnspruch").value;
+  if(r===""||isNaN(+r)||+r<0){$("suErr").textContent="Bitte trage deinen Resturlaub ein (0, wenn du keinen hast).";$("suErr").hidden=false;return}
+  var gz=$("suGz").value.trim(),gv=gz?parseHM(gz):null;if(gz&&gv===null){$("suErr").textContent="Gleitzeit bitte als Stunden eingeben, z. B. 14:30.";$("suErr").hidden=false;return}
+  var k=konto(year);S.konten[String(year)]={anspruch:an>=0?an:30,stand:+r,standDatum:todayIso,restBis:k.restBis||iso(year,4,31)};
+  if(gv!==null){S.gleitzeit=S.gleitzeit.filter(function(x){return x.datum!==todayIso});S.gleitzeit.push({datum:todayIso,min:gv})}
+  S.setupDone=true;save();$("setup").hidden=true;render();toast("Gespeichert. Viel Spaß beim Planen!")});
+document.addEventListener("submit",function(e){if(e.target.id!=="wtForm")return;e.preventDefault();var d=selected;if(!d||!S.wichtig[d])return;snapshot();
+  S.wichtig[d]={titel:$("wtTitel").value.trim()||"Wichtiger Termin",von:$("wtVon").value,bis:$("wtBis").value,notiz:$("wtNotiz").value.trim()};editing=null;save();render();toast("Termin gespeichert",true)});
+document.addEventListener("change",function(e){var t=e.target;if(t.dataset&&t.dataset.bsub!==undefined){var b=renderLists.bl[+t.dataset.bsub];if(!b)return;snapshot();b.days.forEach(function(d){S.urlaub[d]=t.value});save();render();toast("Vertretung "+t.value+" für "+rangeTxt(b.from,b.to)+" eingetragen",true)}});
+/* ---------- Export ---------- */
+function exportData(){
+  var r=viewRange(),tn={};terminInstances().forEach(function(i){i.days.forEach(function(d){tn[d]=i.t.name})});
+  var days=Object.keys(S.urlaub).concat(Object.keys(S.gleittage)).filter(function(d){return inView(d)&&isWorkday(d)}).sort();
+  var seen={},einzel=[];days.forEach(function(d){if(seen[d])return;seen[d]=1;var gl=!S.urlaub[d];
+    einzel.push([{d:d},WDL[dow(d)],kw(d),gl?"Gleittag":"Urlaub",gl?"":(S.urlaub[d]||"NN"),gl?"":"Konto "+d.slice(0,4),tn[d]||"",ferienAt(S.ferien.nrw,d)?"NRW-"+ferienAt(S.ferien.nrw,d):""])});
+  var zr=blocks().map(function(b){var fs=freeSpan(b.days);return [{d:b.from},{d:b.to},b.n,fs.n,b.subs||"NN",b.name||"",Object.keys(b.perYear).sort().map(function(y){return b.perYear[y]+" × "+y}).join(", ")]});
+  var vt=Object.keys(S.vertretung).filter(inView).sort().map(function(d){return [{d:d},WDL[dow(d)],kw(d),S.vertretung[d],S.urlaub[d]||S.gleittage[d]?"Konflikt: ich bin frei":""]});
+  var wt=Object.keys(S.wichtig).filter(inView).sort().map(function(d){var W=S.wichtig[d];return [{d:d},WDL[dow(d)],W.titel,W.von?(W.von+(W.bis?"–"+W.bis:"")):"",W.notiz||"",S.urlaub[d]||S.gleittage[d]?"Konflikt: ich bin frei":""]});
+  return {range:r,sheets:[
+    {name:"Urlaubstage",head:["Datum","Wochentag","KW","Art","Vertretung","zählt für","Anlass","Schulferien"],rows:einzel,w:[12,12,5,10,11,12,30,20]},
+    {name:"Zeiträume",head:["von","bis","Urlaubstage","freie Tage am Stück","Vertretung","Anlass","Aufteilung Konto"],rows:zr,w:[12,12,12,18,14,30,18]},
+    {name:"Ich vertrete",head:["Datum","Wochentag","KW","für","Hinweis"],rows:vt,w:[12,12,5,10,24]},
+    {name:"Wichtige Termine",head:["Datum","Wochentag","Termin","Uhrzeit","Hinweis","Hinweis 2"],rows:wt,w:[12,12,28,13,40,22]}]}}
+function cellText(v){return v&&v.d?de(v.d,true):String(v===undefined||v===null?"":v)}
+function toTSV(sheet){return [sheet.head].concat(sheet.rows).map(function(r){return r.map(function(v){return cellText(v).replace(/[\t\n]/g," ")}).join("\t")}).join("\n")}
+function toCSV(sheet){return "\ufeff"+[sheet.head].concat(sheet.rows).map(function(r){return r.map(function(v){var t=cellText(v);return /[;"\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t}).join(";")}).join("\r\n")}
+/* kleines XLSX ohne Fremdbibliothek: ZIP (ohne Kompression) + SpreadsheetML */
+var CRC=(function(){var t=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){var c=0xFFFFFFFF;for(var i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zip(files){var enc=new TextEncoder(),parts=[],central=[],off=0;
+  function u16(v){return [v&255,(v>>>8)&255]}function u32(v){return [v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255]}
+  files.forEach(function(f){var name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+    var lh=[].concat(u32(0x04034b50),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0));
+    parts.push(new Uint8Array(lh),name,data);
+    central.push([].concat(u32(0x02014b50),u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off)),name);
+    off+=lh.length+name.length+data.length});
+  var cdStart=off,cdLen=0;central.forEach(function(c){var a=Array.isArray(c)?new Uint8Array(c):c;parts.push(a);cdLen+=a.length});
+  parts.push(new Uint8Array([].concat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(cdLen),u32(cdStart),u16(0))));
+  return new Blob(parts,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})}
+function xesc(t){return String(t).replace(/[<>&"]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]}).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"")}
+function colName(i){var s="";i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+function sheetXml(sh){var rows=[sh.head].concat(sh.rows);
+  var x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>'+
+    sh.w.map(function(w,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>'}).join("")+'</cols><sheetData>';
+  rows.forEach(function(r,ri){x+='<row r="'+(ri+1)+'">';r.forEach(function(v,ci){var ref=colName(ci)+(ri+1);
+    if(ri===0&&v&&v.d){var hs=Math.round((parse(v.d)-Date.UTC(1899,11,30))/864e5);x+='<c r="'+ref+'" s="2"><v>'+hs+'</v></c>'}
+    else if(ri===0)x+='<c r="'+ref+'" t="inlineStr" s="1"><is><t>'+xesc(v)+'</t></is></c>';
+    else if(v&&v.d){var serial=Math.round((parse(v.d)-Date.UTC(1899,11,30))/864e5);x+='<c r="'+ref+'" s="2"><v>'+serial+'</v></c>'}
+    else if(typeof v==="number")x+='<c r="'+ref+'"><v>'+v+'</v></c>';
+    else if(v!==""&&v!==undefined&&v!==null)x+='<c r="'+ref+'" t="inlineStr"><is><t xml:space="preserve">'+xesc(v)+'</t></is></c>'});x+='</row>'});
+  return x+'</sheetData>'+(rows.length>1&&!sh.hdrDates?'<autoFilter ref="A1:'+colName(sh.head.length-1)+rows.length+'"/>':'')+'</worksheet>'}
+function buildXlsx(ex){var n=ex.sheets.length,files=[];
+  files.push({name:"[Content_Types].xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+
+    ex.sheets.map(function(s,i){return '<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'}).join("")+'</Types>'});
+  files.push({name:"_rels/.rels",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'});
+  files.push({name:"xl/workbook.xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+
+    ex.sheets.map(function(s,i){return '<sheet name="'+xesc(s.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>'}).join("")+'</sheets>'+
+    ex.sheets.map(function(s,i){return s.rows.length?'':''}).join("")+'</workbook>'});
+  files.push({name:"xl/_rels/workbook.xml.rels",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+    ex.sheets.map(function(s,i){return '<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>'}).join("")+
+    '<Relationship Id="rId'+(n+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'});
+  files.push({name:"xl/styles.xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="dd.mm.yyyy"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFCE4CC"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Standard" xfId="0" builtinId="0"/></cellStyles></styleSheet>'});
+  ex.sheets.forEach(function(s,i){files.push({name:"xl/worksheets/sheet"+(i+1)+".xml",data:sheetXml(s)})});
+  return zip(files)}
+function saveFile(name,blob,infoId,onReject){
+  var info=$(infoId||"expInfo");
+  function viaLink(){try{var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},2000);info.textContent="„"+name+"“ wird gespeichert. Auf dem iPad findest du sie danach in der Dateien-App unter Downloads."}catch(e){info.textContent="Speichern ist hier nicht möglich. Nutze „Tabelle kopieren“."}}
+  if(window.claude&&window.claude.use){window.claude.use("downloads").then(function(dl){if(!dl){viaLink();return}
+    dl.save({filename:name,data:blob}).then(function(){info.textContent="„"+name+"“ gespeichert."},function(e){if(onReject&&e&&e.code==="rejected_extension"){onReject(dl);return}info.textContent=e&&e.code==="declined"?"Speichern abgebrochen.":"Speichern ging hier nicht. Nutze „Tabelle kopieren“ und füge sie in Excel ein."})},viaLink)}
+  else viaLink()}
+/* Büro-Tabelle: C1 = 01.01. des Jahres, 372 Tage bis NJ (07.01. Folgejahr) */
+function bueroRow(withCover){var start=iso(year,0,1),out=[];
+  for(var i=0;i<372;i++){var d=addDays(start,i),v="";
+    if(S.urlaub[d]!==undefined&&isWorkday(d))v=S.urlaub[d]||"NN";
+    else if(withCover&&S.vertretung[d])v=1;
+    out.push({d:d,v:v})}return out}
+function bueroSheet(){var r=bueroRow(true);return {name:"Büro-Zeile "+year,head:r.map(function(x){return {d:x.d}}),rows:[r.map(function(x){return x.v})],w:r.map(function(){return 11}),hdrDates:true}}
+function icsEsc(t){return String(t||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n")}
+function icsFold(l){var o="",enc=new TextEncoder();while(enc.encode(l).length>73){var n=36;o+=l.slice(0,n)+"\r\n ";l=l.slice(n)}return o+l}
+function icsD(d){return d.replace(/-/g,"")}
+function buildIcs(){var L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Mein Urlaubsplaner//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Urlaub"],
+  stamp=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z",n=0;
+  function ev(uid,props){n++;L.push("BEGIN:VEVENT","UID:"+uid+"@urlaubsplaner.rm","DTSTAMP:"+stamp);props.forEach(function(p){L.push(icsFold(p))});L.push("END:VEVENT")}
+  function allDay(from,to){return ["DTSTART;VALUE=DATE:"+icsD(from),"DTEND;VALUE=DATE:"+icsD(addDays(to,1)),"TRANSP:TRANSPARENT"]}
+  blocks().forEach(function(b){ev("urlaub-"+b.from,allDay(b.from,b.to).concat(["SUMMARY:"+icsEsc("Urlaub"+(b.name?" ("+b.name+")":"")),
+    "DESCRIPTION:"+icsEsc(b.n+" Urlaubstag"+(b.n===1?"":"e")+". Vertretung: "+(b.subs||"NN"))]))});
+  Object.keys(S.gleittage).filter(inView).sort().forEach(function(d){ev("gleittag-"+d,allDay(d,d).concat(["SUMMARY:Gleittag"]))});
+  coverGroups().forEach(function(g){ev("vertretung-"+g.from,allDay(g.from,g.to).concat(["SUMMARY:"+icsEsc("Ich vertrete "+g.who)]))});
+  Object.keys(S.wichtig).filter(inView).sort().forEach(function(d){var W=S.wichtig[d],p;
+    if(W.von){var bis=W.bis||(function(){var h=+W.von.slice(0,2)+1;return String(Math.min(h,23)).padStart(2,"0")+W.von.slice(2)})();
+      p=["DTSTART:"+icsD(d)+"T"+W.von.replace(":","")+"00","DTEND:"+icsD(d)+"T"+bis.replace(":","")+"00"]}
+    else p=allDay(d,d);
+    p=p.concat(["SUMMARY:"+icsEsc(W.titel||"Wichtiger Termin")]);if(W.notiz)p.push("DESCRIPTION:"+icsEsc(W.notiz));
+    p.push("BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(W.titel||"Wichtiger Termin"),"TRIGGER:-P1D","END:VALARM");
+    ev("termin-"+d,p)});
+  L.push("END:VCALENDAR");return {text:L.join("\r\n")+"\r\n",n:n}}
+function expName(ext){var r=viewRange();return "Urlaubsplan_RM_"+r[0].slice(0,7)+"_bis_"+r[1].slice(0,7)+"."+ext}
+$("expXlsx").addEventListener("click",function(){var ex=exportData();ex.sheets.push(bueroSheet());saveFile(expName("xlsx"),buildXlsx(ex))});
+$("expCsv").addEventListener("click",function(){saveFile(expName("csv"),new Blob([toCSV(exportData().sheets[0])],{type:"text/csv"}))});
+$("expCopy").addEventListener("click",function(){var ex=exportData(),txt=toTSV(ex.sheets[0])+"\n\n"+toTSV(ex.sheets[1]);
+  try{navigator.clipboard.writeText(txt).then(function(){$("expInfo").textContent="Kopiert: Einzeltage und darunter die Zeiträume. In Excel in Zelle A1 tippen und „Einsetzen“ wählen."},function(){$("expInfo").textContent="Kopieren ging hier nicht. Nutze „Excel-Datei speichern“."})}catch(e){$("expInfo").textContent="Kopieren ging hier nicht. Nutze „Excel-Datei speichern“."}});
+$("bzCopy").addEventListener("click",function(){var r=bueroRow($("bzVt").checked),txt=r.map(function(x){return x.v}).join("\t"),
+  nU=r.filter(function(x){return typeof x.v==="string"&&x.v}).length,nNN=r.filter(function(x){return x.v==="NN"}).length,nV=r.filter(function(x){return x.v===1}).length;
+  var msg="Kopiert: 372 Felder (01.01."+year+" bis 07.01."+(year+1)+"), davon "+nU+" Urlaubstage"+(nNN?" ("+nNN+" × NN)":"")+(nV?" und "+nV+" Vertretungstage":"")+". Jetzt in der Büro-Tabelle C16 antippen und „Einsetzen“ wählen. Achtung: Das überschreibt die ganze Zeile 16 ab C.";
+  try{navigator.clipboard.writeText(txt).then(function(){$("bzInfo").textContent=msg},function(){$("bzInfo").textContent="Kopieren ging hier nicht. In der Excel-Datei (Excel-Datei speichern) gibt es das Blatt „Büro-Zeile“ zum Kopieren."})}catch(e){$("bzInfo").textContent="Kopieren ging hier nicht. In der Excel-Datei gibt es das Blatt „Büro-Zeile“ zum Kopieren."}});
+$("icsSave").addEventListener("click",function(){var c=buildIcs(),name="Urlaub_RM_"+year+".ics";
+  if(!c.n){$("icsInfo").textContent="Es gibt noch keine Einträge für den Kalender.";return}
+  saveFile(name,new Blob([c.text],{type:"text/calendar"}),"icsInfo",function(dl){
+    var z=zip([{name:name,data:c.text}]);
+    dl.save({filename:"Urlaub_RM_"+year+"_Kalender.zip",data:z}).then(function(){$("icsInfo").textContent="Gespeichert als ZIP (die Testversion erlaubt keine .ics-Dateien direkt). In der Dateien-App die ZIP antippen, dann die Datei „"+name+"“ antippen und „Alle hinzufügen“ wählen."},function(e){$("icsInfo").textContent=e&&e.code==="declined"?"Speichern abgebrochen.":"Speichern ging hier nicht."})});
+  if(!(window.claude&&window.claude.use))$("icsInfo").textContent=c.n+" Einträge. Safari fragt gleich, ob du sie zum Kalender hinzufügen willst."});
+$("suImport").addEventListener("click",function(){$("setup").hidden=true;showView("optionen");setTimeout(function(){var t=$("ioText");t.scrollIntoView({block:"center"});t.focus()},80);toast("Füge hier den kopierten Sicherungstext ein und tippe auf „Text laden“.")});
+$("rangeMode").addEventListener("change",function(){rangeOn=this.checked;anchor=null;hint();renderMonths()});
+$("undo").addEventListener("click",undo);$("toastUndo").addEventListener("click",function(){undo();$("toast").hidden=true});
+$("prevY").addEventListener("click",function(){year--;anchor=null;selected=null;render()});
+$("nextY").addEventListener("click",function(){year++;anchor=null;selected=null;render()});
+$("saveSettings").addEventListener("click",function(){
+  var oldK=S.konten[String(year)]||{},newSt=Math.max(0,+$("sRest").value||0);
+  snapshot();S.konten[String(year)]={anspruch:Math.max(0,+$("sAnspruch").value||0),stand:newSt,standDatum:(oldK.stand===newSt&&oldK.standDatum)?oldK.standDatum:todayIso,restBis:$("sRestBis").value||iso(year,4,31)};
+  S.ansicht={vorlauf:+$("sVor").value,nachlauf:+$("sNach").value};
+  var a1=parseHM($("sAzMoDo").value),a2=parseHM($("sAzFr").value);if(a1!==null&&a1>=0)[1,2,3,4].forEach(function(i){S.arbeitszeit[i]=a1});if(a2!==null&&a2>=0)S.arbeitszeit[5]=a2;
+  S.gleitMax=Math.max(0,+$("sGzMax").value||32);
+  S.freieTage=$("sFrei").value.split(/[,;\s]+/).map(function(t){var m=t.match(/^(\d{1,2})\.(\d{1,2})\.?$/);return m?String(+m[2]).padStart(2,"0")+"-"+String(+m[1]).padStart(2,"0"):null}).filter(Boolean);
+  for(var hk in hCache)delete hCache[hk];
+  var tm=$("sTeam").value.split(/[,;\s]+/).map(function(x){return x.trim().toUpperCase()}).filter(Boolean);if(tm.length)S.team=tm;
+  save();render();toast("Einstellungen übernommen",true);
+});
+function exportText(){return JSON.stringify(S,null,1)}
+$("exportBtn").addEventListener("click",function(){
+  var txt=exportText();$("ioText").value=txt;
+  try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"application/json"}));a.download="urlaubsplan-"+todayIso+".json";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}catch(e){}
+  toast("Sicherung erstellt. Falls kein Download startet: Text unten kopieren.");
+});
+$("copyBtn").addEventListener("click",function(){
+  var txt=exportText();$("ioText").value=txt;
+  try{navigator.clipboard.writeText(txt).then(function(){toast("Sicherung in die Zwischenablage kopiert")},function(){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")})}catch(e){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")}
+});
+function importFrom(txt){
+  try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien||!o.vertretung)throw 0;snapshot();S=o;if(!S.team)S.team=["CT","SM","MPB"];if(!S.konten)S.konten={};save();render();toast("Daten geladen",true)}
+  catch(e){toast("Das ist keine gültige Sicherung des Urlaubsplaners.")}
+}
+$("importText").addEventListener("click",function(){importFrom($("ioText").value)});
+$("importFile").addEventListener("change",function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){importFrom(r.result)};r.readAsText(f);this.value=""});
+var resetArmed=false;
+$("resetBtn").addEventListener("click",function(){
+  if(!resetArmed){resetArmed=true;this.textContent="Wirklich zurücksetzen?";var b=this;setTimeout(function(){resetArmed=false;b.textContent="Alles löschen und neu beginnen"},4000);return}
+  resetArmed=false;this.textContent="Alles löschen und neu beginnen";snapshot();S=seed();save();render();toast("Alles gelöscht",true);
+});
+
+/* ---------- Start ---------- */
+S=load();for(var hk0 in hCache)delete hCache[hk0];
+var ty=new Date().getFullYear();year=S.konten[String(ty+1)]?ty+1:(S.konten[String(ty)]?ty:2027);
+render();
+showView((location.hash||"").slice(1)||"kalender",true);
+window.addEventListener("hashchange",function(){showView(location.hash.slice(1),true)});
+if(!S.setupDone)showSetup();
+window.__planner={exportData:exportData,buildXlsx:buildXlsx,toTSV:toTSV,gleitCalc:gleitCalc,terminInstances:terminInstances,suggestions:suggestions,parseHM:parseHM,calc:calc,holidays:holidays,blocks:blocks,conflicts:conflicts,isWorkday:isWorkday,easter:easter,kw:kw,get state(){return S}};
+})();
+</script>
+
+<script>if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(function(){})}</script>
+</body>
+</html>
