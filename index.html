@@ -173,6 +173,7 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute
 .btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:14px}
 .btn:disabled{opacity:.45}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
+.storewarn{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;max-width:min(680px,calc(100% - 32px));background:#b42318;color:#fff;border-radius:14px;padding:12px 44px 12px 16px;font-size:14px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.25)}.storewarn button{position:absolute;right:8px;top:8px;background:transparent;border:0;color:#fff;font-size:22px;width:32px;height:32px;cursor:pointer}
 .exportp label.chk{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}.exportp label.chk input{margin-top:3px;width:18px;height:18px;flex:none}
 .hint.active{color:var(--accent);font-weight:600}
 /* Hinweise */
@@ -509,6 +510,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
     <button class="btn" type="button" id="suImport">Ich habe schon Daten (Sicherung laden)</button>
   </form>
 </div>
+<div class="storewarn" id="storeWarn" hidden role="alert"><b>Achtung: Hier wird nichts dauerhaft gespeichert.</b> <span id="storeWarnTxt"></span> <button id="storeWarnX" aria-label="Hinweis schließen">×</button></div>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" hidden>Rückgängig</button></div>
 
 <script>
@@ -602,7 +604,35 @@ function migrate(o){var d=seed();
   if(!o.migFrei){Object.keys(o.urlaub).concat(Object.keys(o.gleittage||{})).forEach(function(d){if(/-12-(24|31)$/.test(d)){delete o.urlaub[d];if(o.gleittage)delete o.gleittage[d]}});o.migFrei=true}
   if(!o.mig3003){if(o.vertretung["2027-03-30"]==="CT")delete o.vertretung["2027-03-30"];o.mig3003=true}
   if(o.setupDone===undefined)o.setupDone=false;o.version=2;return o}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+/* ---------- Speichern: dreifach abgesichert ---------- */
+var lsOk=true,cloud=null,cloudTimer=null,cloudBusy=false,cloudAgain=false;
+function storeWarn(t){$("storeWarnTxt").textContent=t;$("storeWarn").hidden=false}
+function save(){var txt=JSON.stringify(S),t=Date.now();
+  try{localStorage.setItem(KEY,txt);localStorage.setItem(KEY+".t",String(t));if(localStorage.getItem(KEY)!==txt)throw 0;lsOk=true}
+  catch(e){if(lsOk)storeWarn("Dein Browser lässt das Speichern nicht zu (z. B. Privates Surfen oder „Alle Cookies blockieren“ in den Safari-Einstellungen). Sichere deine Daten unter Optionen.");lsOk=false}
+  idbPut(txt,t);cloudSave()}
+function localT(){try{return +localStorage.getItem(KEY+".t")||0}catch(e){return 0}}
+function idb(){return new Promise(function(res,rej){try{var r=indexedDB.open("urlaubsplaner",1);r.onupgradeneeded=function(){r.result.createObjectStore("kv")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}}catch(e){rej(e)}})}
+function idbPut(txt,t){idb().then(function(db){var tx=db.transaction("kv","readwrite");tx.objectStore("kv").put({json:txt,t:t},"state")}).catch(function(){})}
+function idbGet(){return idb().then(function(db){return new Promise(function(res){var r=db.transaction("kv").objectStore("kv").get("state");r.onsuccess=function(){res(r.result||null)};r.onerror=function(){res(null)}})}).catch(function(){return null})}
+function cloudSave(){if(!cloud)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudWrite,1200)}
+function cloudWrite(){if(!cloud)return;if(cloudBusy){cloudAgain=true;return}cloudBusy=true;
+  cloud.ref.set({json:JSON.stringify(S),t:Date.now()}).catch(function(){}).then(function(){cloudBusy=false;if(cloudAgain){cloudAgain=false;cloudWrite()}})}
+function adopt(txt,why){try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien)return false;S=migrate(o);for(var k in hCache)delete hCache[k];
+  try{localStorage.setItem(KEY,JSON.stringify(S));localStorage.setItem(KEY+".t",String(Date.now()))}catch(e){}
+  if(S.setupDone)$("setup").hidden=true;
+  render();if(why)toast(why);return true}catch(e){return false}}
+function restore(){
+  var hadLocal=false;try{hadLocal=!!localStorage.getItem(KEY)}catch(e){}
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
+  // 1. IndexedDB, falls localStorage leer oder älter ist
+  idbGet().then(function(r){if(r&&r.json&&(!hadLocal||r.t>localT()))adopt(r.json,hadLocal?"":"Deine Daten wurden wiederhergestellt")});
+  // 2. im Artifact: Speicher in deinem Claude-Konto (geräteübergreifend)
+  if(window.claude&&window.claude.use){Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(a){var db=a[0],u=a[1];if(!db||!u)return;
+    return u.id().then(function(id){if(!id)return;var ref=db.doc("data/users/"+id+"/plan");
+      return ref.get().then(function(snap){cloud={ref:ref};
+        if(snap.exists){var d=snap.data();if(d&&d.json&&(+d.t||0)>localT())adopt(d.json,"Daten aus deinem Konto geladen")}
+        else if(hadLocal)cloudWrite()})})}).catch(function(){})}}
 function snapshot(){undoStack.push(JSON.stringify(S));if(undoStack.length>50)undoStack.shift();$("undo").disabled=false}
 function undo(){if(!undoStack.length)return;S=JSON.parse(undoStack.pop());for(var hk in hCache)delete hCache[hk];save();$("undo").disabled=!undoStack.length;render();toast("Rückgängig gemacht")}
 /* Resturlaub: "stand" = Urlaubstage des Vorjahres, die am Stichtag noch übrig sind. Urlaub im Vorjahr ab dem Stichtag wird davon abgezogen, der Rest ist der Übertrag. */
@@ -1217,11 +1247,14 @@ $("resetBtn").addEventListener("click",function(){
 
 /* ---------- Start ---------- */
 S=load();for(var hk0 in hCache)delete hCache[hk0];
+(function(){try{var x="__t";localStorage.setItem(x,"1");localStorage.removeItem(x)}catch(e){lsOk=false;storeWarn("Dein Browser lässt das Speichern nicht zu (z. B. Privates Surfen oder „Alle Cookies blockieren“ in den Safari-Einstellungen). Ohne Speichern sind deine Einträge beim nächsten Öffnen weg.")}})();
 var ty=new Date().getFullYear();year=S.konten[String(ty+1)]?ty+1:(S.konten[String(ty)]?ty:2027);
 render();
 showView((location.hash||"").slice(1)||"kalender",true);
 window.addEventListener("hashchange",function(){showView(location.hash.slice(1),true)});
 if(!S.setupDone)showSetup();
+restore();
+$("storeWarnX").addEventListener("click",function(){$("storeWarn").hidden=true});
 window.__planner={exportData:exportData,buildXlsx:buildXlsx,toTSV:toTSV,gleitCalc:gleitCalc,terminInstances:terminInstances,suggestions:suggestions,parseHM:parseHM,calc:calc,holidays:holidays,blocks:blocks,conflicts:conflicts,isWorkday:isWorkday,easter:easter,kw:kw,get state(){return S}};
 })();
 </script>
