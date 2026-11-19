@@ -173,6 +173,16 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute
 .btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:14px}
 .btn:disabled{opacity:.45}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
+.vedal{display:grid;gap:4px;font-size:13px;color:var(--muted);margin-top:10px}.vedal input{font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:1px solid var(--line,#ccd);background:var(--surface);color:var(--fg)}
+#vedaText{width:100%;min-height:90px;margin-top:8px;box-sizing:border-box}
+.vdiff{margin-top:12px}.vdiff h3{font-size:14px;margin:12px 0 6px}.vdiff ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.vdiff li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:var(--day);font-size:14px}
+.vdiff li .btn{padding:6px 10px;font-size:13px}.vdiff .okmsg{margin-top:10px}
+.d.vdok::before,.d.vdnew::before,.d.vdkr::before{content:"";position:absolute;bottom:9%;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 1.5px var(--surface)}
+.d.vdnew::before{background:var(--warn)}
+.d.vdkr::before{background:#8a5cd1}
+.d.vdmiss{outline:2px dashed var(--warn);outline-offset:1px}
+.leg .d.demo.vdok,.leg .d.demo.vdnew,.leg .d.demo.vdmiss{display:inline-flex}
 .storewarn{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:90;max-width:min(680px,calc(100% - 32px));background:#b42318;color:#fff;border-radius:14px;padding:12px 44px 12px 16px;font-size:14px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.25)}.storewarn button{position:absolute;right:8px;top:8px;background:transparent;border:0;color:#fff;font-size:22px;width:32px;height:32px;cursor:pointer}
 .exportp label.chk{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}.exportp label.chk input{margin-top:3px;width:18px;height:18px;flex:none}
 .hint.active{color:var(--accent);font-weight:600}
@@ -463,6 +473,18 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
         <label>Plan endet<select id="sNach"><option value="0">31. Dezember</option><option value="15">15. Januar Folgejahr</option><option value="31">31. Januar Folgejahr</option></select></label>
       </div>
       <div class="row"><button class="btn" id="saveSettings">Übernehmen</button></div>
+      <h2 style="margin-top:18px" id="vedaH">Abgleich mit VEDA</h2>
+      <div class="hint" style="margin-top:0">Vergleicht deinen Plan mit den Einträgen aus VEDA Horizon (Urlaub, Gleittage, Krankheit). Der Link bleibt nur auf diesem Gerät gespeichert, er landet weder in Sicherungen noch auf GitHub.</div>
+      <label class="vedal">Kalender-Feed-Link aus VEDA<input id="vedaUrl" type="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://rkn.cloud…"></label>
+      <div class="row">
+        <button class="btn primary" id="vedaFetch">Jetzt abrufen</button>
+        <button class="btn" id="vedaPaste">Aus Zwischenablage einfügen</button>
+        <label class="btn" style="display:inline-flex;align-items:center">Kalenderdatei laden<input id="vedaFile" type="file" accept=".ics,text/calendar,text/plain" hidden></label>
+      </div>
+      <textarea id="vedaText" hidden placeholder="VEDA-Kalendertext hier einfügen (beginnt mit BEGIN:VCALENDAR)"></textarea>
+      <div class="row" id="vedaTextRow" hidden><button class="btn" id="vedaTextGo">Text übernehmen</button></div>
+      <div class="hint" id="vedaInfo"></div>
+      <div id="vedaDiff"></div>
       <h2 style="margin-top:18px">Datensicherung</h2>
       <div class="hint" style="margin-top:0">Deine Einträge bleiben auf diesem Gerät gespeichert. Sichere sie trotzdem ab und zu.</div>
       <div class="hint" id="storeInfo"></div>
@@ -494,7 +516,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
   </div>
   <div class="dsec">
     <h3>Farben</h3>
-    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht Mo–Do 8:45 h, Fr 6:00 h Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
+    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht Mo–Do 8:45 h, Fr 6:00 h Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo ur vdok">14</span><span><b>Urlaub steht auch in VEDA</b><small>grüner Punkt</small></span></li><li><span class="d demo ur vdnew">14</span><span><b>Urlaub geplant, aber noch nicht in VEDA</b><small>roter Punkt: noch beantragen</small></span></li><li><span class="d demo vdmiss">14</span><span><b>In VEDA eingetragen, aber nicht im Plan</b><small>gestrichelter Rand</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
   </div>
 </aside>
 <div class="daycard" id="dayCard" hidden><div class="dayinfo" id="dayInfo"></div><button class="x" id="dayClose" aria-label="Schließen">×</button></div>
@@ -793,7 +815,7 @@ function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var todayIso=(function(){var t=new Date();return iso(t.getFullYear(),t.getMonth(),t.getDate())})();
 
-function renderMonths(){
+function renderMonths(){var vcmp=vedaCompare();
   var conf={};conflicts().forEach(function(d){conf[d]=1});
   var sug=suggestions();
   var h="";
@@ -816,6 +838,8 @@ function renderMonths(){
       if(gt&&!ur)cls.push("gt");
       if(sug[s]&&S.optionen.vor!==false)cls.push("vor");
       if(S.wichtig[s])cls.push("wt");
+      if(vcmp[s]==="ok")cls.push("vdok");else if(vcmp[s]==="new")cls.push("vdnew");else if(vcmp[s]==="miss")cls.push("vdmiss");else if(vcmp[s]==="krank")cls.push("vdkr");
+      if(vcmp[s]){var vdd=vedaDays()[s];lab+=vcmp[s]==="new"?", noch nicht in VEDA":", VEDA: "+(vdd?vdd.t:"")}
       if(conf[s])cls.push("conf");
       if(s===todayIso)cls.push("today");
       if(s===selected)cls.push("sel");
@@ -892,12 +916,16 @@ function renderWarns(){
   var sg=suggestions(),sk=Object.keys(sg).filter(function(d){return +d.slice(0,4)===year}).sort();
   if(sk.length){var byName={};sk.forEach(function(d){(byName[sg[d]]=byName[sg[d]]||[]).push(d)});
     Object.keys(byName).forEach(function(nm){var ds=byName[nm];items.push({t:"Vorschlag „"+nm+"“: "+ds.length+" Tag"+(ds.length>1?"e":"")+" noch nicht eingetragen ("+ds.slice(0,3).map(function(d){return WD[dow(d)]+" "+de(d)}).join(", ")+(ds.length>3?" …":"")+").",info:true,d:ds[0]})})}
+  if(S.veda&&S.veda.ev){var vc=vedaCompare(),vm=vedaRanges(vc,"miss",true),vn=vedaRanges(vc,"new",true);
+    if(vm.length)items.push({t:"VEDA: "+vm.length+" Zeitraum"+(vm.length>1?"e":"")+" in VEDA eingetragen, aber nicht im Plan (zuerst "+rangeTxt(vm[0].from,vm[0].to)+").",d:vm[0].from,veda:true});
+    if(vn.length)items.push({t:"VEDA: "+vn.reduce(function(a,b){return a+b.days.length},0)+" geplante Urlaubstage sind noch nicht in VEDA (noch beantragen).",info:true,veda:true});
+    var age=(Date.now()-S.veda.stand)/864e5;if(age>14)items.push({t:"VEDA-Daten sind "+Math.floor(age)+" Tage alt. Unter Optionen neu abrufen.",info:true,veda:true})}
   var nx=Object.keys(S.urlaub).filter(function(d){return +d.slice(0,4)===year+1&&inView(d)&&isWorkday(d)}).length;
   if(nx)items.push({t:nx+" Urlaubstag"+(nx>1?"e":"")+" im Januar "+(year+1)+" gehen aufs Konto "+(year+1)+".",info:true});
   var serious=items.filter(function(i){return !i.info}).length;
   $("warnSum").innerHTML='Hinweise '+(serious?'<span class="wcount">'+serious+' wichtig</span>':'')+(items.length-serious?'<span class="wcount info">'+(items.length-serious)+' Info</span>':'');
   if(!items.length){$("warns").innerHTML='<div class="okmsg">Alles im grünen Bereich.</div>';return}
-  $("warns").innerHTML='<ul class="warns">'+items.map(function(it){return '<li class="'+(it.info?'info':'')+'">'+esc(it.t)+(it.d?' <button data-go="'+it.d+'">Anzeigen</button>':'')+(it.view?' <button data-view="konto">Kürzungshelfer öffnen</button>':'')+'</li>'}).join("")+'</ul>';
+  $("warns").innerHTML='<ul class="warns">'+items.map(function(it){return '<li class="'+(it.info?'info':'')+'">'+esc(it.t)+(it.d?' <button data-go="'+it.d+'">Anzeigen</button>':'')+(it.view?' <button data-view="konto">Kürzungshelfer öffnen</button>':'')+(it.veda?' <button data-vopen="1">VEDA-Abgleich</button>':'')+'</li>'}).join("")+'</ul>';
 }
 function renderDay(){
   var d=selected;$("dayCard").hidden=!d||view!=="kalender";if(!d){return}
@@ -909,6 +937,7 @@ function renderDay(){
   var W=S.wichtig[d];
   var tn=terminAt(d);if(tn)tags.push(["Fester Termin: "+tn,"var(--vor-bg)","var(--fg)"]);
   if(fn)tags.push(["Schulferien NRW: "+fn,"var(--ferien)","#2a2100"]);
+  var vdx=vedaDays()[d],vc=vedaCompare()[d];if(vdx)tags.push(["VEDA: "+(vdx.t||vdx.k)+(vc==="miss"?" (nicht im Plan)":""),vc==="miss"?"var(--warn-bg)":"var(--day)",vc==="miss"?"var(--warn)":"var(--fg)"]);else if(vc==="new")tags.push(["Noch nicht in VEDA","var(--warn-bg)","var(--warn)"]);
   if(isWeekend(d))tags.push(["Wochenende","var(--we-bg)","var(--we)"]);
   $("dayInfo").innerHTML='<b>'+WDL[dow(d)]+', '+de(d,true)+'</b> <span class="sub">KW '+kw(d)+(soll(d)&&isWorkday(d)?' · Soll '+hm(soll(d))+' h':'')+'</span><div class="tags">'+
     (tags.length?tags.map(function(t){return '<span class="tag" style="background:'+t[1]+';color:'+t[2]+'">'+esc(t[0])+'</span>'}).join(""):(W?'':'<span class="sub">Normaler Arbeitstag</span>'))+'</div>'+
@@ -1029,7 +1058,7 @@ function renderSettings(){
   var k=konto(year);$("setYear1").textContent=year;$("sAnspruch").value=k.anspruch;$("sRest").value=k.stand;$("sRestBis").value=k.restBis;$("sTeam").value=S.team.join(", ");$("sFrei").value=(S.freieTage||[]).map(function(md){return md.split("-").reverse().join(".")+"."}).join(", ");$("sAzMoDo").value=hm(S.arbeitszeit[1]);$("sAzFr").value=hm(S.arbeitszeit[5]);$("sGzMax").value=S.gleitMax||32;$("sVor").value=String(ansicht().vorlauf);$("sNach").value=String(ansicht().nachlauf);
 }
 function render(){try{renderCut()}catch(e){console.error(e)}
-$("yearLbl").textContent=year;var vr=viewRange();$("planSub").textContent="Plan "+year+" · "+de(vr[0],true)+" bis "+de(vr[1],true);renderKonto();renderTools();renderWarns();renderMonths();renderDay();renderLists();renderSettings()}
+$("yearLbl").textContent=year;var vr=viewRange();$("planSub").textContent="Plan "+year+" · "+de(vr[0],true)+" bis "+de(vr[1],true);renderKonto();renderTools();renderWarns();renderMonths();renderDay();renderLists();renderSettings();try{renderVeda()}catch(e){console.error(e)}}
 
 var tT;
 function toast(msg,withUndo){$("toastMsg").textContent=msg;$("toastUndo").hidden=!withUndo;$("toast").hidden=false;clearTimeout(tT);tT=setTimeout(function(){$("toast").hidden=true},4000)}
@@ -1109,6 +1138,81 @@ $("setupForm").addEventListener("submit",function(e){e.preventDefault();
 document.addEventListener("submit",function(e){if(e.target.id!=="wtForm")return;e.preventDefault();var d=selected;if(!d||!S.wichtig[d])return;snapshot();
   S.wichtig[d]={titel:$("wtTitel").value.trim()||"Wichtiger Termin",von:$("wtVon").value,bis:$("wtBis").value,notiz:$("wtNotiz").value.trim()};editing=null;save();render();toast("Termin gespeichert",true)});
 document.addEventListener("change",function(e){var t=e.target;if(t.dataset&&t.dataset.bsub!==undefined){var b=renderLists.bl[+t.dataset.bsub];if(!b)return;snapshot();b.days.forEach(function(d){S.urlaub[d]=t.value});save();render();toast("Vertretung "+t.value+" für "+rangeTxt(b.from,b.to)+" eingetragen",true)}});
+/* ---------- VEDA-Abgleich ---------- */
+var VKEY=KEY+".vedaUrl";
+function vedaUrlGet(){try{return localStorage.getItem(VKEY)||""}catch(e){return ""}}
+function vedaUrlSet(u){try{if(u)localStorage.setItem(VKEY,u);else localStorage.removeItem(VKEY)}catch(e){}}
+function vedaKind(t){t=String(t||"").toLowerCase();
+  if(/krank|arbeitsunf|au-|kind krank/.test(t))return "krank";
+  if(/gleit|zeitausgleich|überstund|ueberstund|freizeitausgleich|azv/.test(t))return "gleit";
+  if(/sonderurlaub|bildungsurlaub/.test(t))return "sonst";
+  if(/urlaub|erholung/.test(t))return "urlaub";
+  return "sonst"}
+function icsDate(v){var m=/^(\d{4})(\d{2})(\d{2})/.exec(v||"");return m?m[1]+"-"+m[2]+"-"+m[3]:null}
+function parseVeda(txt){
+  if(!/BEGIN:VCALENDAR/i.test(txt||""))return null;
+  var lines=String(txt).replace(/\r\n[ \t]/g,"").replace(/\n[ \t]/g,"").split(/\r?\n/),ev=[],cur=null;
+  lines.forEach(function(l){
+    if(/^BEGIN:VEVENT/i.test(l)){cur={};return}
+    if(/^END:VEVENT/i.test(l)){if(cur&&cur.s){
+        var e=cur.e||cur.s;if(cur.allDay&&cur.e&&cur.e>cur.s)e=addDays(cur.e,-1);if(e<cur.s)e=cur.s;
+        var t=(cur.t||"").replace(/\\n/g," ").replace(/\\([,;\\])/g,"$1").trim();
+        if(cur.status!=="CANCELLED")ev.push({s:cur.s,e:e,t:t,k:vedaKind(t+" "+(cur.c||""))})}cur=null;return}
+    if(!cur)return;var i=l.indexOf(":");if(i<0)return;var key=l.slice(0,i).toUpperCase(),val=l.slice(i+1),name=key.split(";")[0];
+    if(name==="DTSTART"){cur.s=icsDate(val);cur.allDay=/VALUE=DATE(?!-)/.test(key)||/^\d{8}$/.test(val.trim())}
+    else if(name==="DTEND")cur.e=icsDate(val);
+    else if(name==="SUMMARY")cur.t=val;
+    else if(name==="CATEGORIES")cur.c=val;
+    else if(name==="STATUS")cur.status=val.trim().toUpperCase()});
+  return ev}
+var vCache=null,vCacheKey="";
+function vedaDays(){var v=S.veda;if(!v||!v.ev)return {};var key=v.stand+"|"+v.ev.length;if(vCache&&vCacheKey===key)return vCache;
+  var m={};v.ev.forEach(function(e){var d=e.s,n=0;while(d<=e.e&&n<400){var o=m[d];if(!o||o.k==="sonst")m[d]={k:e.k,t:e.t};d=addDays(d,1);n++}});
+  vCache=m;vCacheKey=key;return m}
+function vedaFrom(){var v=S.veda;if(!v||!v.ev||!v.ev.length)return null;return v.ev.reduce(function(a,e){return e.s<a?e.s:a},"9999")}
+/* Abgleich je Arbeitstag: ok, nur Plan (noch beantragen), nur VEDA (übernehmen?) */
+function vedaCompare(){var vd=vedaDays(),from=vedaFrom(),out={};if(!from)return out;
+  var days={};Object.keys(S.urlaub).concat(Object.keys(S.gleittage)).concat(Object.keys(vd)).forEach(function(d){days[d]=1});
+  Object.keys(days).forEach(function(d){if(d<from||!isWorkday(d))return;var v=vd[d],pk=S.urlaub[d]!==undefined?"urlaub":(S.gleittage[d]?"gleit":null);
+    if(v&&(v.k==="urlaub"||v.k==="gleit")){if(pk)out[d]="ok";else out[d]="miss"}
+    else if(v&&v.k==="krank"){out[d]="krank"}
+    else if(pk&&d>=todayIso)out[d]="new"});
+  return out}
+function vedaRanges(cmp,state,inYear){var ds=Object.keys(cmp).filter(function(d){return cmp[d]===state&&(!inYear||inView(d))}).sort(),out=[],cur=null;
+  ds.forEach(function(d){if(cur){var nx=addDays(cur.to,1),ok=true;while(nx<d){if(isWorkday(nx)){ok=false;break}nx=addDays(nx,1)}if(ok){cur.to=d;cur.days.push(d);return}}cur={from:d,to:d,days:[d]};out.push(cur)});return out}
+function vedaApply(txt,src){var ev=parseVeda(txt);
+  if(!ev){$("vedaInfo").textContent="Das ist kein Kalendertext aus VEDA (er muss mit BEGIN:VCALENDAR beginnen).";return false}
+  snapshot();S.veda={stand:Date.now(),src:src,ev:ev};vCache=null;save();render();
+  toast("VEDA: "+ev.length+" Einträge übernommen",true);return true}
+function vedaFetch(silent){var u=vedaUrlGet();if(!u){if(!silent)$("vedaInfo").textContent="Bitte zuerst den Link aus VEDA einfügen.";return}
+  u=u.replace(/^webcal:\/\//i,"https://");if(!silent)$("vedaInfo").textContent="Rufe VEDA ab …";
+  fetch(u,{cache:"no-store",credentials:"omit"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()})
+   .then(function(t){if(!vedaApply(t,"link")&&!silent)return})
+   .catch(function(){if(silent)return;$("vedaInfo").innerHTML="Der VEDA-Server erlaubt den direkten Abruf aus der App nicht (das ist eine Sperre auf seiner Seite, kein Fehler bei dir). <b>So geht es trotzdem:</b> Lege in der App <b>Kurzbefehle</b> einen Kurzbefehl mit zwei Aktionen an: „Inhalte von URL abrufen“ (dein VEDA-Link) und „In Zwischenablage kopieren“. Führe ihn aus und tippe hier auf „Aus Zwischenablage einfügen“."})}
+function renderVeda(){if(!$("vedaDiff"))return;var inp=$("vedaUrl");if(document.activeElement!==inp)inp.value=vedaUrlGet();
+  var v=S.veda;if(!v||!v.ev){$("vedaInfo").textContent=$("vedaInfo").textContent||"Noch keine VEDA-Daten.";$("vedaDiff").innerHTML="";return}
+  var cnt={urlaub:0,gleit:0,krank:0,sonst:0};v.ev.forEach(function(e){cnt[e.k]++});
+  $("vedaInfo").textContent="VEDA-Stand: "+new Date(v.stand).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+" Uhr · "+v.ev.length+" Einträge ("+cnt.urlaub+" Urlaub, "+cnt.gleit+" Gleitzeit, "+cnt.krank+" Krankheit, "+cnt.sonst+" Sonstiges)";
+  var cmp=vedaCompare(),miss=vedaRanges(cmp,"miss",true),nw=vedaRanges(cmp,"new",true),ok=vedaRanges(cmp,"ok",true);
+  vedaDiff.lastMiss=miss;
+  function nWd(b){return b.days.length}
+  var h='<div class="vdiff">';
+  if(!miss.length&&!nw.length)h+='<div class="okmsg">Plan und VEDA stimmen im angezeigten Zeitraum überein.</div>';
+  if(miss.length)h+='<h3>In VEDA eingetragen, aber nicht in deinem Plan</h3><ul>'+miss.map(function(b,i){var k=vedaDays()[b.from];return '<li><span>'+rangeTxt(b.from,b.to)+' · '+nWd(b)+' Tag'+(nWd(b)>1?'e':'')+' · '+esc(k.t||k.k)+'</span><span><button class="btn" data-go="'+b.from+'">Anzeigen</button> <button class="btn primary" data-vtake="'+i+'">In Plan übernehmen</button></span></li>'}).join("")+'</ul>';
+  if(nw.length)h+='<h3>In deinem Plan, aber noch nicht in VEDA (noch beantragen)</h3><ul>'+nw.map(function(b){return '<li><span>'+rangeTxt(b.from,b.to)+' · '+nWd(b)+' Tag'+(nWd(b)>1?'e':'')+'</span><button class="btn" data-go="'+b.from+'">Anzeigen</button></li>'}).join("")+'</ul>';
+  if(ok.length)h+='<h3>Stimmt überein</h3><ul>'+ok.map(function(b){return '<li><span>'+rangeTxt(b.from,b.to)+' · '+nWd(b)+' Tag'+(nWd(b)>1?'e':'')+'</span><span style="color:var(--ok);font-weight:700">✓</span></li>'}).join("")+'</ul>';
+  $("vedaDiff").innerHTML=h+'</div>'}
+var vedaDiff={};
+$("vedaUrl").addEventListener("change",function(){var u=this.value.trim();vedaUrlSet(u);$("vedaInfo").textContent=u?"Link gespeichert (nur auf diesem Gerät).":"Link entfernt."});
+$("vedaFetch").addEventListener("click",function(){var u=$("vedaUrl").value.trim();if(u)vedaUrlSet(u);vedaFetch(false)});
+$("vedaPaste").addEventListener("click",function(){
+  function manual(){$("vedaText").hidden=false;$("vedaTextRow").hidden=false;$("vedaText").focus();$("vedaInfo").textContent="Füge den Text hier ein und tippe auf „Text übernehmen“."}
+  try{navigator.clipboard.readText().then(function(t){if(!vedaApply(t,"zwischenablage"))manual()},manual)}catch(e){manual()}});
+$("vedaTextGo").addEventListener("click",function(){if(vedaApply($("vedaText").value,"text")){$("vedaText").value="";$("vedaText").hidden=true;$("vedaTextRow").hidden=true}});
+$("vedaFile").addEventListener("change",function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){vedaApply(String(r.result),"datei")};r.readAsText(f);this.value=""});
+document.addEventListener("click",function(e){var vo=e.target.closest&&e.target.closest("[data-vopen]");if(vo){showView("optionen");setTimeout(function(){$("vedaH").scrollIntoView({block:"start",behavior:"smooth"})},60);return}
+  var b=e.target.closest&&e.target.closest("[data-vtake]");if(!b)return;var blk=(vedaDiff.lastMiss||[])[+b.dataset.vtake];if(!blk)return;
+  var vd=vedaDays();snapshot();blk.days.forEach(function(d){if(vd[d]&&vd[d].k==="gleit")S.gleittage[d]=true;else S.urlaub[d]=S.urlaub[d]||"NN"});save();render();toast(rangeTxt(blk.from,blk.to)+" in den Plan übernommen",true)});
 /* ---------- Export ---------- */
 function exportData(){
   var r=viewRange(),tn={};terminInstances().forEach(function(i){i.days.forEach(function(d){tn[d]=i.t.name})});
@@ -1257,7 +1361,7 @@ render();
 showView((location.hash||"").slice(1)||"kalender",true);
 window.addEventListener("hashchange",function(){showView(location.hash.slice(1),true)});
 if(!S.setupDone)showSetup();
-restore();renderStore();
+restore();renderStore();if(vedaUrlGet())setTimeout(function(){vedaFetch(true)},1500);
 $("storeWarnX").addEventListener("click",function(){$("storeWarn").hidden=true});
 window.__planner={exportData:exportData,buildXlsx:buildXlsx,toTSV:toTSV,gleitCalc:gleitCalc,terminInstances:terminInstances,suggestions:suggestions,parseHM:parseHM,calc:calc,holidays:holidays,blocks:blocks,conflicts:conflicts,isWorkday:isWorkday,easter:easter,kw:kw,get state(){return S}};
 })();
