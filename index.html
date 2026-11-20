@@ -247,7 +247,8 @@ ul.tlist>li{display:flex}.tlist li>span{flex:1 1 260px;min-width:0}.tlist li .bt
 .d.ft{background:var(--feiertag);color:var(--feiertag-fg);font-weight:600}
 .d.ur{background:var(--urlaub);color:var(--urlaub-fg);font-weight:600}
 .d.vt{background:var(--vertr);color:var(--vertr-fg);font-weight:600}
-.d .ini{font-family:var(--font);font-size:7.5px;font-weight:700;margin-top:1px;letter-spacing:-.02em;max-width:100%;white-space:nowrap}
+.d .ini{font-family:var(--font);font-size:8px;font-weight:700;margin-top:1px;letter-spacing:-.02em;max-width:100%;white-space:nowrap}
+.d .ini.nn{opacity:.75;font-style:italic}
 .d{--fr:0 0 0 0 transparent;--ir:inset 0 0 0 0 transparent;box-shadow:var(--fr),var(--ir)}
 .d.fer{--fr:0 0 0 3px var(--ferien)}
 .d.conf{--ir:inset 0 0 0 3px var(--warn)}
@@ -487,7 +488,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
     <div class="panel">
       <div class="tmnav"><button id="tmPrev" aria-label="Vorheriger Monat">‹</button><strong id="tmLbl"></strong><button id="tmNext" aria-label="Nächster Monat">›</button></div>
       <div class="tgwrap" id="tgWrap"></div>
-      <div class="hint">Orange = Urlaub (mit Kürzel der Vertretung), hellblau G = Gleittag, schwarz = vertritt jemanden, roter Rand = Konflikt.</div>
+      <div class="hint">Orange = Urlaub (mit Kürzel der Vertretung), hellblau = Gleittag (mit Kürzel der Vertretung), schwarz = vertritt jemanden, roter Rand = Konflikt.</div>
     </div>
     <div class="panel" style="margin-top:14px">
       <h2>Konflikte im Plan <span id="tcRange"></span></h2>
@@ -568,7 +569,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
   </div>
   <div class="dsec">
     <h3>Farben</h3>
-    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht die Sollzeit des Tages von der Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo ur vdok">14</span><span><b>Urlaub steht auch in VEDA</b><small>grüner Punkt</small></span></li><li><span class="d demo ur vdnew">14</span><span><b>Urlaub geplant, aber noch nicht in VEDA</b><small>roter Punkt: noch beantragen</small></span></li><li><span class="d demo vdmiss">14</span><span><b>In VEDA eingetragen, aber nicht im Plan</b><small>gestrichelter Rand</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
+    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14<span class="ini">CT</span></span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag; klein steht, wer dich vertritt („NN“ = noch offen)</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht die Sollzeit des Tages von der Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo ur vdok">14</span><span><b>Urlaub steht auch in VEDA</b><small>grüner Punkt</small></span></li><li><span class="d demo ur vdnew">14</span><span><b>Urlaub geplant, aber noch nicht in VEDA</b><small>roter Punkt: noch beantragen</small></span></li><li><span class="d demo vdmiss">14</span><span><b>In VEDA eingetragen, aber nicht im Plan</b><small>gestrichelter Rand</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
   </div>
 </aside>
 <div class="daycard" id="dayCard" hidden><div class="dayinfo" id="dayInfo"></div><button class="x" id="dayClose" aria-label="Schließen">×</button></div>
@@ -838,7 +839,7 @@ function tapDay(d){
       while(x<=b){if(remove){if(S.urlaub[x]){delete S.urlaub[x];n++}}else if(isWorkday(x)&&!S.urlaub[x]){S.urlaub[x]=sub;delete S.gleittage[x];n++}x=addDays(x,1)}
       toast((remove?"−":"+")+n+" Urlaubstage ("+de(a)+"–"+de(b)+")",true);
     }else if(mode==="gleit"){var rg=!!S.gleittage[src],mins=0;
-      while(x<=b){if(rg){if(S.gleittage[x]){delete S.gleittage[x];n++;mins+=soll(x)}}else if(isWorkday(x)&&!S.gleittage[x]){S.gleittage[x]=true;delete S.urlaub[x];n++;mins+=soll(x)}x=addDays(x,1)}
+      while(x<=b){if(rg){if(S.gleittage[x]){delete S.gleittage[x];n++;mins+=soll(x)}}else if(isWorkday(x)&&!S.gleittage[x]){S.gleittage[x]=sub||"NN";delete S.urlaub[x];n++;mins+=soll(x)}x=addDays(x,1)}
       toast((rg?"−":"+")+n+" Gleittage = "+hm(mins)+" h ("+de(a)+"–"+de(b)+")",true);
     }else if(mode==="termin"){
       while(x<=b){if(!S.wichtig[x]){S.wichtig[x]={titel:"Wichtiger Termin",von:"",bis:"",notiz:""};n++}x=addDays(x,1)}
@@ -864,7 +865,7 @@ function tapDay(d){
   }
   if(mode==="gleit"){
     if(!S.gleittage[d]&&!isWorkday(d)){toast("Wochenende oder Feiertag: kein Gleittag nötig");renderDay();renderMonths();return}
-    snapshot();if(S.gleittage[d])delete S.gleittage[d];else{S.gleittage[d]=true;delete S.urlaub[d];toast("Gleittag: "+hm(soll(d))+" h von der Gleitzeit",true)}
+    snapshot();if(S.gleittage[d])delete S.gleittage[d];else{S.gleittage[d]=sub||"NN";delete S.urlaub[d];toast("Gleittag: "+hm(soll(d))+" h von der Gleitzeit",true)}
     save();render();return;
   }
   if(mode==="urlaub"){
@@ -883,6 +884,8 @@ function removeBlock(days,kind){snapshot();days.forEach(function(d){delete S[kin
 
 /* ---------- Darstellung ---------- */
 function $(id){return document.getElementById(id)}
+function gtSub(d){var v=S.gleittage[d];return typeof v==="string"&&v?v:"NN"}
+function iniHtml(v){v=v||"NN";var t=v.length>3?v.split(/[\/+, ]/)[0]+"+":v;return '<span class="ini'+(v==="NN"?' nn':'')+'">'+esc(t)+'</span>'}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var todayIso=(function(){var t=new Date();return iso(t.getFullYear(),t.getMonth(),t.getDate())})();
 
@@ -905,8 +908,8 @@ function renderMonths(){var vcmp=vedaCompare();
           fn=S.optionen.nrw!==false?ferienAt(S.ferien.nrw,s):null,gt=S.gleittage[s],inner=String(d),lab=d+". "+MONTHS[m]+" "+y;
       if(we)cls.push("we");if(ft)cls.push("ft");
       if(vt&&!ur){cls.push("vt");inner+='<span class="ini">'+esc(vt.length>3?vt.split(/[\/+, ]/)[0]+"+":vt)+'</span>'}
-      if(ur)cls.push("ur");
-      if(gt&&!ur)cls.push("gt");
+      if(ur){cls.push("ur");inner+=iniHtml(ur)}
+      if(gt&&!ur){cls.push("gt");inner+=iniHtml(gtSub(s))}
       if(sug[s]&&S.optionen.vor!==false)cls.push("vor");
       if(S.wichtig[s])cls.push("wt");
       if(vcmp[s]==="ok")cls.push("vdok");else if(vcmp[s]==="new")cls.push("vdnew");else if(vcmp[s]==="miss")cls.push("vdmiss");else if(vcmp[s]==="krank")cls.push("vdkr");
@@ -1003,7 +1006,7 @@ function renderDay(){
   var tags=[],ft=holiday(d),fn=ferienAt(S.ferien.nrw,d);
   if(ft)tags.push(["Feiertag: "+ft,"var(--feiertag)","var(--feiertag-fg)"]);
   if(S.urlaub[d])tags.push(["Urlaub · Vertretung "+S.urlaub[d],"var(--urlaub)","var(--urlaub-fg)"]);
-  if(S.gleittage[d])tags.push(["Gleittag · "+hm(soll(d))+" h","var(--gleit)","var(--gleit-fg)"]);
+  if(S.gleittage[d])tags.push(["Gleittag · "+hm(soll(d))+" h · Vertretung "+gtSub(d),"var(--gleit)","var(--gleit-fg)"]);
   if(S.vertretung[d])tags.push(["Ich vertrete "+S.vertretung[d],"var(--vertr)","var(--vertr-fg)"]);
   var W=S.wichtig[d];
   var tn=terminAt(d);if(tn)tags.push(["Fester Termin: "+tn,"var(--vor-bg)","var(--fg)"]);
@@ -1014,7 +1017,7 @@ function renderDay(){
     (tags.length?tags.map(function(t){return '<span class="tag" style="background:'+t[1]+';color:'+t[2]+'">'+esc(t[0])+'</span>'}).join(""):(W?'':'<span class="sub">Normaler Arbeitstag</span>'))+'</div>'+
     (W&&editing!==d?'<div class="wtbox"><span class="wtico"></span><div><b>'+esc(W.titel)+'</b>'+(W.von?'<span class="sub"> · '+esc(W.von)+(W.bis?'–'+esc(W.bis):'')+' Uhr</span>':'')+(W.notiz?'<p class="wtnote">'+esc(W.notiz).replace(/\n/g,"<br>")+'</p>':'<p class="wtnote sub">Kein Hinweis eingetragen.</p>')+'<div class="dacts"><button class="btn sm" data-wedit="1">Bearbeiten</button><button class="btn sm" data-unset="wichtig">Termin löschen</button></div></div></div>':'')+
     (W&&editing===d?'<form class="wtform" id="wtForm"><label>Titel<input id="wtTitel" type="text" value="'+esc(W.titel)+'"></label><div class="wtt"><label>von<input id="wtVon" type="time" value="'+esc(W.von)+'"></label><label>bis<input id="wtBis" type="time" value="'+esc(W.bis)+'"></label></div><label>Hinweis<textarea id="wtNotiz" rows="3" placeholder="z. B. Raum, Unterlagen, wer vorbereitet">'+esc(W.notiz)+'</textarea></label><div class="dacts"><button class="btn sm primary" type="submit">Speichern</button><button class="btn sm" type="button" data-wcancel="1">Abbrechen</button><button class="btn sm" type="button" data-unset="wichtig">Termin löschen</button></div></form>':'')+
-    (S.urlaub[d]?'<div class="dsub">Wer vertritt mich?'+["NN"].concat(S.team).map(function(o){return '<button class="chip ur" data-dsub="'+esc(o)+'" aria-pressed="'+(S.urlaub[d]===o)+'">'+esc(o)+'</button>'}).join("")+'</div>':'')+
+    (S.urlaub[d]||S.gleittage[d]?'<div class="dsub">Wer vertritt mich?'+["NN"].concat(S.team).map(function(o){var cur=S.urlaub[d]||gtSub(d);return '<button class="chip ur" data-dsub="'+esc(o)+'" aria-pressed="'+(cur===o)+'">'+esc(o)+'</button>'}).join("")+'</div>':'')+
     ((S.urlaub[d]||S.gleittage[d]||S.vertretung[d])?'<div class="dacts">'+
       (S.vertretung[d]?'<button class="btn sm" data-unset="vertretung">Vertretung zurücksetzen</button>':'')+
       (S.urlaub[d]?'<button class="btn sm" data-unset="urlaub">Urlaub entfernen</button>':'')+
@@ -1106,7 +1109,7 @@ function renderLists(){var _r=viewRange();if($("expRange"))$("expRange").textCon
 }
 function renderTools(){
   document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.mode===mode))});
-  $("urlaubOpts").hidden=mode!=="urlaub";$("vertrOpts").hidden=mode!=="vertr";
+  $("urlaubOpts").hidden=mode!=="urlaub"&&mode!=="gleit";$("vertrOpts").hidden=mode!=="vertr";
   $("subChips").innerHTML=["NN"].concat(S.team).map(function(t){return '<button class="chip ur" data-sub="'+esc(t)+'" aria-pressed="'+(t===sub)+'">'+esc(t)+'</button>'}).join("");
   var opts=S.team.slice();if(S.team.length>1)opts.push(S.team[0]+"/"+S.team[S.team.length-1]);
   if(opts.indexOf(cover)<0)opts.push(cover);
@@ -1148,6 +1151,7 @@ document.addEventListener("click",function(e){
   if(t.id==="coverOther"){var w=document.createElement("input");w.className="chip";w.placeholder="Kürzel";w.style.width="90px";w.setAttribute("autocapitalize","characters");
     t.replaceWith(w);w.focus();w.addEventListener("change",function(){var v=w.value.trim().toUpperCase();if(v){cover=v}renderTools()});return}
   if(t.dataset.go){if(view!=="kalender")showView("kalender");var d=t.dataset.go;selected=d;renderDay();renderMonths();var el=$("m"+(+d.slice(0,4))+"-"+(+d.slice(5,7)-1));if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
+  if(t.dataset.dsub&&selected&&!S.urlaub[selected]&&S.gleittage[selected]){snapshot();S.gleittage[selected]=t.dataset.dsub;save();render();toast(de(selected,true)+": Vertretung "+t.dataset.dsub,true);return}
   if(t.dataset.dsub&&selected&&S.urlaub[selected]){snapshot();S.urlaub[selected]=t.dataset.dsub;save();render();toast(de(selected,true)+": Vertretung "+t.dataset.dsub,true);return}
   if(t.dataset.unset&&selected){var dd=selected,k=t.dataset.unset;snapshot();
     if(k==="all"){delete S.urlaub[dd];delete S.gleittage[dd];delete S.vertretung[dd];delete S.wichtig[dd]}else delete S[k][dd];editing=null;
@@ -1219,9 +1223,9 @@ document.addEventListener("change",function(e){var t=e.target;if(t.dataset&&t.da
 /* ---------- Team ---------- */
 var tMonth=null;
 function teamFile(){var o={typ:"urlaubsplaner-team",version:1,kuerzel:S.profil.kuerzel||"",name:S.profil.name||"",stand:new Date().toISOString(),
-  urlaub:S.urlaub,gleittage:Object.keys(S.gleittage||{}).sort(),vertretung:S.vertretung,vertreter:S.team||[]};return o}
+  urlaub:S.urlaub,gleittage:Object.keys(S.gleittage||{}).sort(),gleitVertretung:(function(){var o={};Object.keys(S.gleittage||{}).forEach(function(d){o[d]=gtSub(d)});return o})(),vertretung:S.vertretung,vertreter:S.team||[]};return o}
 function readTeamFile(txt){try{var o=JSON.parse(txt);if(!o||o.typ!=="urlaubsplaner-team"||!o.kuerzel||typeof o.urlaub!=="object")return null;
-  var g={};(o.gleittage||[]).forEach(function(d){if(/^\d{4}-\d{2}-\d{2}$/.test(d))g[d]=true});
+  var g={},gv=o.gleitVertretung||{};(o.gleittage||[]).forEach(function(d){if(/^\d{4}-\d{2}-\d{2}$/.test(d))g[d]=gv[d]?String(gv[d]).slice(0,20):"NN"});
   function clean(m){var r={};Object.keys(m||{}).forEach(function(d){if(/^\d{4}-\d{2}-\d{2}$/.test(d))r[d]=String(m[d]==null?"":m[d]).slice(0,20)});return r}
   return {kuerzel:String(o.kuerzel).toUpperCase().slice(0,6),name:String(o.name||"").slice(0,40),stand:String(o.stand||""),urlaub:clean(o.urlaub),gleittage:g,vertretung:clean(o.vertretung)}}catch(e){return null}}
 function teamImport(txts){var ok=[],bad=0,own=0;
@@ -1233,12 +1237,12 @@ function teamImport(txts){var ok=[],bad=0,own=0;
 function members(){var me={kz:S.profil.kuerzel||"Ich",name:S.profil.name||"Ich",urlaub:S.urlaub,gleit:S.gleittage||{},vert:S.vertretung,me:true};
   return [me].concat(Object.keys(S.kollegen||{}).sort().map(function(k){var m=S.kollegen[k];return {kz:m.kuerzel,name:m.name||m.kuerzel,urlaub:m.urlaub||{},gleit:m.gleittage||{},vert:m.vertretung||{},stand:m.stand}}))}
 function mAbsent(p,d){return isWorkday(d)&&(p.urlaub[d]!==undefined||!!p.gleit[d])}
-function mSubs(p,d){var v=p.urlaub[d];if(!v||v==="NN")return [];return String(v).toUpperCase().split(/[\/,+ ]+/).filter(Boolean)}
+function mSubs(p,d){var v=p.urlaub[d]!==undefined?p.urlaub[d]:(typeof p.gleit[d]==="string"?p.gleit[d]:(p.gleit[d]?"NN":""));if(!v||v==="NN")return [];return String(v).toUpperCase().split(/[\/,+ ]+/).filter(Boolean)}
 function teamConflicts(){var ms=members(),by={},r=viewRange(),out={},cells={};ms.forEach(function(m){by[m.kz]=m});
   function add(key,txt,d,serious,who){var o=out[key]||(out[key]={t:txt,days:[],serious:serious});o.days.push(d);(who||[]).forEach(function(w){cells[w+"|"+d]=1})}
   var d=r[0];while(d<=r[1]){if(isWorkday(d)){var abs=ms.filter(function(m){return mAbsent(m,d)});
     abs.forEach(function(p){var subs=mSubs(p,d);
-      if(p.urlaub[d]!==undefined&&!subs.length)add("nn|"+p.kz,p.name+" ("+p.kz+"): Vertretung noch offen (NN)",d,false,[]);
+      if(!subs.length)add("nn|"+p.kz,p.name+" ("+p.kz+"): Vertretung noch offen (NN)",d,false,[]);
       subs.forEach(function(sk){var q=by[sk];if(!q)return;
         if(mAbsent(q,d))add("both|"+p.kz+"|"+sk,p.name+" ("+p.kz+") ist weg, die Vertretung "+q.name+" ("+sk+") aber auch",d,true,[p.kz,sk]);
         else{var qv=String(q.vert[d]||"").toUpperCase().split(/[\/,+ ]+/);if(qv.indexOf(p.kz)<0)add("abspr|"+p.kz+"|"+sk,p.name+" ("+p.kz+") hat "+q.name+" ("+sk+") als Vertretung eingetragen, bei "+sk+" steht das aber nicht",d,false,[sk])}})});
@@ -1258,7 +1262,7 @@ function renderTeam(){if(!$("tgWrap"))return;var r=viewRange();
     for(var i=1;i<=len;i++){var d=iso(y,m,i),c=[],txt="",ttl=WDL[dow(d)]+", "+de(d,true)+": "+p.name;
       var ft=holiday(d);if(isFree(d))c.push(ft?"ft":"we");
       if(p.urlaub[d]!==undefined&&!isFree(d)){c.push("ur");txt=p.urlaub[d]||"NN";ttl+=" Urlaub, Vertretung "+txt}
-      else if(p.gleit[d]&&!isFree(d)){c.push("gt");txt="G";ttl+=" Gleittag"}
+      else if(p.gleit[d]&&!isFree(d)){c.push("gt");txt=typeof p.gleit[d]==="string"?p.gleit[d]:"NN";ttl+=" Gleittag, Vertretung "+txt}
       else if(p.vert[d]){c.push("vt");txt=p.vert[d];ttl+=" vertritt "+txt}
       if(tc.cells[p.kz+"|"+d])c.push("cf");if(d===todayIso)c.push("today");
       h+='<td class="'+c.join(" ")+'" title="'+esc(ttl)+'">'+esc(String(txt).replace("/","/\u200b"))+'</td>'}
@@ -1368,13 +1372,13 @@ $("vedaTextGo").addEventListener("click",function(){if(vedaApply($("vedaText").v
 $("vedaFile").addEventListener("change",function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){vedaApply(String(r.result),"datei")};r.readAsText(f);this.value=""});
 document.addEventListener("click",function(e){var vo=e.target.closest&&e.target.closest("[data-vopen]");if(vo){showView("optionen");setTimeout(function(){$("vedaH").scrollIntoView({block:"start",behavior:"smooth"})},60);return}
   var b=e.target.closest&&e.target.closest("[data-vtake]");if(!b)return;var blk=(vedaDiff.lastMiss||[])[+b.dataset.vtake];if(!blk)return;
-  var vd=vedaDays();snapshot();blk.days.forEach(function(d){if(vd[d]&&vd[d].k==="gleit")S.gleittage[d]=true;else S.urlaub[d]=S.urlaub[d]||"NN"});save();render();toast(rangeTxt(blk.from,blk.to)+" in den Plan übernommen",true)});
+  var vd=vedaDays();snapshot();blk.days.forEach(function(d){if(vd[d]&&vd[d].k==="gleit")S.gleittage[d]="NN";else S.urlaub[d]=S.urlaub[d]||"NN"});save();render();toast(rangeTxt(blk.from,blk.to)+" in den Plan übernommen",true)});
 /* ---------- Export ---------- */
 function exportData(){
   var r=viewRange(),tn={};terminInstances().forEach(function(i){i.days.forEach(function(d){tn[d]=i.t.name})});
   var days=Object.keys(S.urlaub).concat(Object.keys(S.gleittage)).filter(function(d){return inView(d)&&isWorkday(d)}).sort();
   var seen={},einzel=[];days.forEach(function(d){if(seen[d])return;seen[d]=1;var gl=!S.urlaub[d];
-    einzel.push([{d:d},WDL[dow(d)],kw(d),gl?"Gleittag":"Urlaub",gl?"":(S.urlaub[d]||"NN"),gl?"":"Konto "+d.slice(0,4),tn[d]||"",ferienAt(S.ferien.nrw,d)?"NRW-"+ferienAt(S.ferien.nrw,d):""])});
+    einzel.push([{d:d},WDL[dow(d)],kw(d),gl?"Gleittag":"Urlaub",gl?gtSub(d):(S.urlaub[d]||"NN"),gl?"":"Konto "+d.slice(0,4),tn[d]||"",ferienAt(S.ferien.nrw,d)?"NRW-"+ferienAt(S.ferien.nrw,d):""])});
   var zr=blocks().map(function(b){var fs=freeSpan(b.days);return [{d:b.from},{d:b.to},b.n,fs.n,b.subs||"NN",b.name||"",Object.keys(b.perYear).sort().map(function(y){return b.perYear[y]+" × "+y}).join(", ")]});
   var vt=Object.keys(S.vertretung).filter(inView).sort().map(function(d){return [{d:d},WDL[dow(d)],kw(d),S.vertretung[d],S.urlaub[d]||S.gleittage[d]?"Konflikt: ich bin frei":""]});
   var wt=Object.keys(S.wichtig).filter(inView).sort().map(function(d){var W=S.wichtig[d];return [{d:d},WDL[dow(d)],W.titel,W.von?(W.von+(W.bis?"–"+W.bis:"")):"",W.notiz||"",S.urlaub[d]||S.gleittage[d]?"Konflikt: ich bin frei":""]});
