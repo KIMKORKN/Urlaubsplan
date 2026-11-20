@@ -173,6 +173,30 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute
 .btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:14px}
 .btn:disabled{opacity:.45}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
+.su2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tgwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px;padding-bottom:6px}
+.tg{border-collapse:separate;border-spacing:2px;font-size:11px}
+.tg th,.tg td{min-width:28px;height:32px;text-align:center;padding:0;border-radius:7px;font-variant-numeric:tabular-nums}
+.tg thead th{font-weight:600;color:var(--muted);font-size:10.5px;line-height:1.15;height:34px}
+.tg thead th.we{color:var(--we)}
+.tg th.pn{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;padding:0 8px 0 2px;min-width:74px;font-size:13px;white-space:nowrap}
+.tg th.pn small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
+.tg td{background:var(--day);color:var(--fg);font-weight:700;font-size:9.5px}
+.tg td.we{background:var(--we-bg)}.tg td.ft{background:var(--feiertag);color:var(--feiertag-fg)}
+.tg td.ur{background:var(--urlaub);color:var(--urlaub-fg)}.tg td.gt{background:var(--gleit);color:var(--gleit-fg)}
+.tg td.vt{background:var(--vertr);color:var(--vertr-fg)}
+.tg td.cf{box-shadow:inset 0 0 0 3px var(--warn)}
+.tg td.today{outline:2px solid var(--fg);outline-offset:-1px}
+.tg tr.me th.pn{color:var(--accent,var(--fg))}
+.tmnav{display:flex;align-items:center;gap:10px;margin-top:4px}.tmnav strong{min-width:150px;text-align:center;font-size:17px}
+.tmnav button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:20px}
+.tlist{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.tlist li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:var(--day);font-size:14px}
+.tlist li.w{background:var(--warn-bg)}.tlist li .btn{padding:6px 10px;font-size:13px}
+ul.tlist>li{display:flex}.tlist li>span{flex:1 1 260px;min-width:0}.tlist li .btn{flex:0 0 auto;width:auto;min-height:36px}
+.modal input{width:100%;min-width:0;box-sizing:border-box}.su2>label{min-width:0}
+@media (max-width:699.98px){.rail button{min-width:0;flex:1 1 0;padding:8px 0;font-size:11px}}
+.tlist .sub{font-size:12.5px}
 .vedal{display:grid;gap:4px;font-size:13px;color:var(--muted);margin-top:10px}.vedal input{font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:1px solid var(--line,#ccd);background:var(--surface);color:var(--fg)}
 #vedaText{width:100%;min-height:90px;margin-top:8px;box-sizing:border-box}
 .vdiff{margin-top:12px}.vdiff h3{font-size:14px;margin:12px 0 6px}.vdiff ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
@@ -346,12 +370,13 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
   <button data-view="zeitstrahl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16"/><circle cx="6" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><path d="M11 7h9M11 12h6M11 17h9"/></svg><span>Zeitstrahl</span></button>
   <button data-view="konto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Konto</span></button>
   <button id="legOpen" aria-controls="legend" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><circle cx="8" cy="16" r="3"/><circle cx="16" cy="16" r="3"/></svg><span>Legende</span></button>
+  <button data-view="team"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.8 14.2c2.4-.3 4.3 1.1 4.8 4.3"/></svg><span>Team</span></button>
   <button data-view="optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Optionen</span></button>
 </nav>
 <div class="app">
   <section class="view" id="v-kalender">
     <header class="hello">
-      <div class="hrow"><span class="hi">Hallo!</span>
+      <div class="hrow"><span class="hi" id="hiName">Hallo!</span>
         <div class="yearnav"><button id="prevY" aria-label="Vorheriges Jahr">‹</button><strong id="yearLbl">2027</strong><button id="nextY" aria-label="Nächstes Jahr">›</button></div></div>
       <p class="big" id="bigLine"></p>
       <div class="bigsub" id="bigSub"></div>
@@ -394,7 +419,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
       </div>
       <div class="hint" id="expInfo"></div>
       <h2 style="margin-top:18px">Für die Büro-Tabelle</h2>
-      <p class="sub" style="margin:0 0 10px">Kopiert deine Zeile genau im Aufbau der Büro-Tabelle: ein Feld pro Tag vom 01.01.<span class="bzY"></span> bis 07.01.<span class="bzY2"></span> (Spalten C bis NJ). An Urlaubstagen steht die Vertretung oder „NN“. In der Büro-Tabelle tippst du auf die Zelle <b>C16</b> (deine Zeile) und wählst „Einsetzen“.</p>
+      <p class="sub" style="margin:0 0 10px">Kopiert deine Zeile genau im Aufbau der Büro-Tabelle: ein Feld pro Tag vom 01.01.<span class="bzY"></span> bis 07.01.<span class="bzY2"></span> (Spalten C bis NJ). An Urlaubstagen steht die Vertretung oder „NN“. In der Büro-Tabelle tippst du auf die Zelle <b id="bzCell">C in deiner Zeile</b> und wählst „Einsetzen“.</p>
       <label class="chk"><input type="checkbox" id="bzVt" checked> Tage, an denen ich vertrete, als „1“ mitkopieren (so zählt die Büro-Tabelle sie nicht als Urlaub; in schwarz formatierten Zellen erscheint das Kürzel)</label>
       <div class="row" style="margin:8px 0 0">
         <button class="btn primary" id="bzCopy">Für Büro-Excel kopieren</button>
@@ -456,6 +481,30 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
     </div>
   </section>
 
+  <section class="view" id="v-team" hidden>
+    <h1 class="vh">Team</h1>
+    <p class="sub" style="margin:0 0 12px">Jede und jeder plant in der eigenen App. Hier legst du die Pläne nebeneinander: Teile deine Teamdatei mit den anderen und lade ihre Dateien. Es gibt keinen Server, alles bleibt auf euren Geräten.</p>
+    <div class="panel">
+      <div class="tmnav"><button id="tmPrev" aria-label="Vorheriger Monat">‹</button><strong id="tmLbl"></strong><button id="tmNext" aria-label="Nächster Monat">›</button></div>
+      <div class="tgwrap" id="tgWrap"></div>
+      <div class="hint">Orange = Urlaub (mit Kürzel der Vertretung), hellblau G = Gleittag, schwarz = vertritt jemanden, roter Rand = Konflikt.</div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h2>Konflikte im Plan <span id="tcRange"></span></h2>
+      <div id="tConf"></div>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h2>Meine Teamdatei</h2>
+      <p class="sub" style="margin:0 0 10px">Enthält nur deine Urlaubstage, Gleittage, Vertretungen und dein Kürzel, keine Gleitzeitstände und keine Notizen. Schick sie per Mail, Teams oder AirDrop an dein Team, am besten nach jeder Änderung.</p>
+      <div class="row" style="margin:0"><button class="btn primary" id="tShare">Teamdatei teilen</button><button class="btn" id="tCopy">Als Text kopieren</button></div>
+      <div class="hint" id="tShareInfo"></div>
+      <h2 style="margin-top:18px">Pläne der anderen</h2>
+      <div class="row" style="margin:0"><label class="btn primary" style="display:inline-flex;align-items:center">Teamdateien laden<input id="tFile" type="file" accept=".json,application/json,text/plain" multiple hidden></label><button class="btn" id="tPaste">Aus Zwischenablage einfügen</button></div>
+      <textarea id="tText" hidden placeholder="Text einer Teamdatei hier einfügen"></textarea>
+      <div class="row" id="tTextRow" hidden><button class="btn" id="tTextGo">Text übernehmen</button></div>
+      <ul class="tlist" id="tMembers"></ul>
+    </div>
+  </section>
   <section class="view" id="v-optionen" hidden>
     <h1 class="vh">Optionen</h1>
     <div class="panel" id="settings">
@@ -468,7 +517,10 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
         <label>Arbeitszeit Fr (h:mm)<input id="sAzFr" type="text" inputmode="decimal"></label>
         <label>Gleitzeit Höchstwert (h)<input id="sGzMax" type="number" min="0" max="200" inputmode="numeric"></label>
         <label>Weitere dienstfreie Tage (TT.MM., Komma)<input id="sFrei" type="text" inputmode="decimal"></label>
-        <label>Team-Kürzel (Komma)<input id="sTeam" type="text" autocapitalize="characters"></label>
+        <label>Dein Vorname<input id="sName" type="text"></label>
+        <label>Dein Kürzel<input id="sKz" type="text" autocapitalize="characters" maxlength="6"></label>
+        <label>Kürzel deiner Vertretungen (Komma)<input id="sTeam" type="text" autocapitalize="characters"></label>
+        <label>Deine Zeile in der Büro-Tabelle<input id="sZeile" type="number" min="1" max="200" inputmode="numeric"></label>
         <label>Plan beginnt<select id="sVor"><option value="0">1. Januar</option><option value="1">1. Dezember Vorjahr</option><option value="2">1. November Vorjahr</option></select></label>
         <label>Plan endet<select id="sNach"><option value="0">31. Dezember</option><option value="15">15. Januar Folgejahr</option><option value="31">31. Januar Folgejahr</option></select></label>
       </div>
@@ -516,7 +568,7 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
   </div>
   <div class="dsec">
     <h3>Farben</h3>
-    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht Mo–Do 8:45 h, Fr 6:00 h Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo ur vdok">14</span><span><b>Urlaub steht auch in VEDA</b><small>grüner Punkt</small></span></li><li><span class="d demo ur vdnew">14</span><span><b>Urlaub geplant, aber noch nicht in VEDA</b><small>roter Punkt: noch beantragen</small></span></li><li><span class="d demo vdmiss">14</span><span><b>In VEDA eingetragen, aber nicht im Plan</b><small>gestrichelter Rand</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
+    <ul class="leg"><li><span class="d demo ">14</span><span><b>Normaler Arbeitstag</b><small>grau</small></span></li><li><span class="d demo ur">14</span><span><b>Mein Urlaub</b><small>zählt als Urlaubstag</small></span></li><li><span class="d demo gt">14</span><span><b>Gleittag</b><small>zieht die Sollzeit des Tages von der Gleitzeit ab</small></span></li><li><span class="d demo vt">14<span class="ini">CT</span></span><span><b>Ich vertrete</b><small>Kürzel der Kollegin bzw. des Kollegen; „CT+“ = mehrere</small></span></li><li><span class="d demo ft">14</span><span><b>Feiertag NRW und dienstfreie Tage</b><small>z. B. 24.12. und 31.12.; arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo we">14</span><span><b>Wochenende</b><small>arbeitsfrei, zählt nicht</small></span></li><li><span class="d demo fer">14</span><span><b>Schulferien NRW</b><small>gelber Ring, egal was an dem Tag ist</small></span></li><li><span class="d demo ur fer">14</span><span><b>Urlaub in den Schulferien</b><small>Kreisfarbe = dein Tag, Ring = Ferien</small></span></li><li><span class="d demo vor">14</span><span><b>Vorschlag</b><small>aus deinen festen Terminen oder Brückentag, noch nicht eingetragen</small></span></li><li><span class="d demo wt">14</span><span><b>Wichtiger Termin</b><small>Quadrat statt Kreis, Farbe bleibt die des Tages. Antippen zeigt Titel, Uhrzeit und Hinweis</small></span></li><li><span class="d demo ur wt">14</span><span><b>Wichtiger Termin an einem Urlaubstag</b><small>wird als Konflikt gemeldet</small></span></li><li><span class="d demo ur conf">14</span><span><b>Konflikt</b><small>Urlaub an einem Tag, an dem du vertreten sollst</small></span></li><li><span class="d demo ur vdok">14</span><span><b>Urlaub steht auch in VEDA</b><small>grüner Punkt</small></span></li><li><span class="d demo ur vdnew">14</span><span><b>Urlaub geplant, aber noch nicht in VEDA</b><small>roter Punkt: noch beantragen</small></span></li><li><span class="d demo vdmiss">14</span><span><b>In VEDA eingetragen, aber nicht im Plan</b><small>gestrichelter Rand</small></span></li><li><span class="d demo today">14</span><span><b>Heute</b></span></li><li><span class="d demo out">16</span><span><b>Außerhalb des Plans</b><small>z. B. nach dem 15. Januar</small></span></li></ul>
   </div>
 </aside>
 <div class="daycard" id="dayCard" hidden><div class="dayinfo" id="dayInfo"></div><button class="x" id="dayClose" aria-label="Schließen">×</button></div>
@@ -524,13 +576,29 @@ textarea{width:100%;min-height:110px;border-radius:8px;border:1px solid var(--li
 <div class="modal" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="setupT">
   <form class="card" id="setupForm">
     <h2 id="setupT">Willkommen in deinem Urlaubsplaner</h2>
-    <div class="sub" style="margin:0">Drei kurze Angaben, dann geht es los. Du kannst alles später in den Einstellungen ändern.</div>
+    <div class="sub" style="margin:0">Ein paar kurze Angaben, dann geht es los. Du kannst alles später unter Optionen ändern.</div>
+    <div class="su2"><label>Dein Vorname<input id="suName" type="text" autocomplete="given-name" placeholder="z. B. Anna"></label>
+    <label>Dein Kürzel<input id="suKz" type="text" autocapitalize="characters" placeholder="z. B. AB" maxlength="6"></label></div>
+    <label>Kürzel der Kolleginnen und Kollegen, die dich vertreten (mit Komma)<input id="suTeam" type="text" autocapitalize="characters" placeholder="z. B. CT, SM, MPB"></label>
+    <div class="su2"><label>Arbeitszeit Mo–Do (h:mm)<input id="suAz1" type="text" inputmode="decimal" placeholder="7:48"></label>
+    <label>Arbeitszeit Fr (h:mm)<input id="suAz5" type="text" inputmode="decimal" placeholder="7:48"></label></div>
     <label><span>Wie viele Urlaubstage aus <span class="suY1"></span> hast du heute noch? (Was du davon im Dezember einträgst, wird abgezogen. Der Rest geht nach <span class="suY2"></span> und muss bis 31.05. genommen werden.)</span><input id="suRest" type="number" min="0" max="60" inputmode="numeric" required></label>
     <label><span>Urlaubsanspruch <span class="suY2"></span> (Tage)</span><input id="suAnspruch" type="number" min="0" max="60" inputmode="numeric" value="30"></label>
     <label>Aktueller Gleitzeitstand (h:mm, freiwillig)<input id="suGz" type="text" inputmode="decimal" placeholder="z. B. 14:30"></label>
     <div class="err" id="suErr" hidden></div>
     <button class="btn primary" type="submit">Los geht’s</button>
     <button class="btn" type="button" id="suImport">Ich habe schon Daten (Sicherung laden)</button>
+  </form>
+</div>
+<div class="modal" id="profil" hidden role="dialog" aria-modal="true" aria-labelledby="profT">
+  <form class="card" id="profForm">
+    <h2 id="profT">Neu: Teamansicht</h2>
+    <div class="sub" style="margin:0">Damit deine Kolleginnen und Kollegen deinen Plan in ihrer App sehen können, braucht die App deinen Namen und dein Kürzel. Deine Einträge bleiben, wie sie sind.</div>
+    <div class="su2"><label>Dein Vorname<input id="pfName" type="text" autocomplete="given-name"></label>
+    <label>Dein Kürzel<input id="pfKz" type="text" autocapitalize="characters" maxlength="6" placeholder="z. B. AB"></label></div>
+    <label>Deine Zeile in der Büro-Tabelle (freiwillig)<input id="pfZeile" type="number" min="1" max="200" inputmode="numeric" placeholder="z. B. 16"></label>
+    <div class="err" id="pfErr" hidden></div>
+    <button class="btn primary" type="submit">Speichern</button>
   </form>
 </div>
 <div class="storewarn" id="storeWarn" hidden role="alert"><b>Achtung: Hier wird nichts dauerhaft gespeichert.</b> <span id="storeWarnTxt"></span> <button id="storeWarnX" aria-label="Hinweis schließen">×</button></div>
@@ -571,9 +639,9 @@ function isWorkday(s){var at=(S&&S.arbeitstage)||[1,2,3,4,5];return at.indexOf(d
 function isFree(s){var at=(S&&S.arbeitstage)||[1,2,3,4,5];return at.indexOf(dow(s))<0}
 
 function defaultTermine(){return [
-  {id:"ostern",name:"Osterurlaub (Wohnwagen)",art:"ferien",ferien:"Osterferien",vers:0,dauer:0,aktiv:true},
+  {id:"ostern",name:"Osterurlaub",art:"ferien",ferien:"Osterferien",vers:0,dauer:0,aktiv:true},
   {id:"vatertag",name:"Vatertagsfahrt mit Brückentag",art:"feiertag",feiertag:"Christi Himmelfahrt",bis:"sonntag",aktiv:true},
-  {id:"sommer",name:"Sommerurlaub (Wohnwagen)",art:"ferien",ferien:"Sommerferien",vers:1,dauer:3,aktiv:true},
+  {id:"sommer",name:"Sommerurlaub",art:"ferien",ferien:"Sommerferien",vers:1,dauer:3,aktiv:true},
   {id:"herbst",name:"Herbsturlaub",art:"ferien",ferien:"Herbstferien",vers:0,dauer:0,aktiv:true},
   {id:"weihnachten",name:"Weihnachten bis erste Januarwoche",art:"fest",von:"12-27",bis:"KW1",aktiv:true}]}
 /* ---------- Startdaten (aus Excel-Urlaubsplan, Stand 19.11.2026) ---------- */
@@ -589,14 +657,16 @@ function seed(){
     optionen:{ft:true,nrw:true,vor:true},
     arbeitstage:[1,2,3,4,5],
     homeoffice:[1,5],
-    arbeitszeit:[0,525,525,525,525,360,0],
+    arbeitszeit:[0,468,468,468,468,468,0],
     gleitMax:32,
     gleitzeit:[],
     gleittage:{},
     wichtig:{},
     freieTage:["12-24","12-31"],
-    termine:defaultTermine(),
+    termine:[],
     team:[],
+    profil:{name:"",kuerzel:"",zeile:""},
+    kollegen:{},
     konten:{},
     urlaub:vac,
     vertretung:{},
@@ -609,8 +679,8 @@ function seed(){
 
 /* ---------- Zustand ---------- */
 var view="kalender";
-function showView(v,noHash){if(["kalender","zeitstrahl","konto","optionen"].indexOf(v)<0)v="kalender";view=v;
-  ["kalender","zeitstrahl","konto","optionen"].forEach(function(n){$("v-"+n).hidden=n!==v});
+function showView(v,noHash){if(["kalender","zeitstrahl","konto","team","optionen"].indexOf(v)<0)v="kalender";view=v;
+  ["kalender","zeitstrahl","konto","team","optionen"].forEach(function(n){$("v-"+n).hidden=n!==v});
   document.querySelectorAll(".rail button").forEach(function(b){if(b.dataset.view===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   $("fab").hidden=v==="konto";$("dayCard").hidden=!(selected&&v==="kalender");
   if(!noHash){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo(0,0)}
@@ -621,7 +691,8 @@ function load(){
   return seed();
 }
 function migrate(o){var d=seed();
-  ["ansicht","optionen","arbeitstage","homeoffice","arbeitszeit","gleitMax","gleitzeit","gleittage","wichtig","freieTage","termine","team","konten","vertretung"].forEach(function(k){if(o[k]===undefined)o[k]=d[k]});
+  ["ansicht","optionen","arbeitstage","homeoffice","arbeitszeit","gleitMax","gleitzeit","gleittage","wichtig","freieTage","termine","team","konten","vertretung","kollegen"].forEach(function(k){if(o[k]===undefined)o[k]=d[k]});
+  if(!o.profil)o.profil={name:"",kuerzel:"",zeile:""};
   ["ft","nrw","vor"].forEach(function(k){if(o.optionen[k]===undefined)o.optionen[k]=true});
   Object.keys(o.konten||{}).forEach(function(y){var k=o.konten[y];if(k.stand===undefined){k.stand=k.rest||0;k.standDatum=todayIso;delete k.rest}});
   if(!o.migFrei){Object.keys(o.urlaub).concat(Object.keys(o.gleittage||{})).forEach(function(d){if(/-12-(24|31)$/.test(d)){delete o.urlaub[d];if(o.gleittage)delete o.gleittage[d]}});o.migFrei=true}
@@ -647,7 +718,7 @@ function cloudWrite(){if(!cloud)return;if(cloudBusy){cloudAgain=true;return}clou
 function adopt(txt,why){try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien)return false;S=migrate(o);for(var k in hCache)delete hCache[k];
   try{localStorage.setItem(KEY,JSON.stringify(S));localStorage.setItem(KEY+".t",String(Date.now()))}catch(e){}
   if(S.setupDone)$("setup").hidden=true;
-  render();if(why)toast(why);return true}catch(e){return false}}
+  render();if(why)toast(why);if(S.setupDone&&!S.profil.kuerzel)askProfil();return true}catch(e){return false}}
 function restore(){
   var hadLocal=false;try{hadLocal=!!localStorage.getItem(KEY)}catch(e){}
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
@@ -1021,7 +1092,7 @@ function renderCut(){var c=calc(year),ops=cutOptions(),bl=blocks().filter(functi
     '<span class="cs"><b class="'+(nl<0?'neg':'okc')+'">'+String(nl).replace("-","−")+'</b><small>übrig danach</small></span><button class="btn sm" data-cut="'+o.i+'">Übernehmen</button></li>'}).join("")+'</ul>';
   $("cutBox").innerHTML=h}
 function renderLists(){var _r=viewRange();if($("expRange"))$("expRange").textContent="("+de(_r[0],true)+" bis "+de(_r[1],true)+")";
-  document.querySelectorAll(".bzY").forEach(function(e){e.textContent=year});document.querySelectorAll(".bzY2").forEach(function(e){e.textContent=year+1});
+  document.querySelectorAll(".bzY").forEach(function(e){e.textContent=year});if($("bzCell"))$("bzCell").textContent=bzCellTxt();document.querySelectorAll(".bzY2").forEach(function(e){e.textContent=year+1});
   var bl=blocks(),cg=coverGroups();renderTimeline(bl,cg);
   renderLists.bl=bl;renderLists.cg=cg;
   var inst=terminInstances(),byT={};inst.forEach(function(i){(byT[i.t.id]=byT[i.t.id]||[]).push(i)});
@@ -1055,10 +1126,11 @@ function hint(){
   $("modeHint").textContent=t;$("modeHint").className="hint"+(act?" active":"");
 }
 function renderSettings(){
-  var k=konto(year);$("setYear1").textContent=year;$("sAnspruch").value=k.anspruch;$("sRest").value=k.stand;$("sRestBis").value=k.restBis;$("sTeam").value=S.team.join(", ");$("sFrei").value=(S.freieTage||[]).map(function(md){return md.split("-").reverse().join(".")+"."}).join(", ");$("sAzMoDo").value=hm(S.arbeitszeit[1]);$("sAzFr").value=hm(S.arbeitszeit[5]);$("sGzMax").value=S.gleitMax||32;$("sVor").value=String(ansicht().vorlauf);$("sNach").value=String(ansicht().nachlauf);
+  var k=konto(year);$("setYear1").textContent=year;$("sAnspruch").value=k.anspruch;$("sRest").value=k.stand;$("sRestBis").value=k.restBis;$("sTeam").value=S.team.join(", ");$("sName").value=S.profil.name||"";$("sKz").value=S.profil.kuerzel||"";$("sZeile").value=S.profil.zeile||"";$("sFrei").value=(S.freieTage||[]).map(function(md){return md.split("-").reverse().join(".")+"."}).join(", ");$("sAzMoDo").value=hm(S.arbeitszeit[1]);$("sAzFr").value=hm(S.arbeitszeit[5]);$("sGzMax").value=S.gleitMax||32;$("sVor").value=String(ansicht().vorlauf);$("sNach").value=String(ansicht().nachlauf);
 }
 function render(){try{renderCut()}catch(e){console.error(e)}
-$("yearLbl").textContent=year;var vr=viewRange();$("planSub").textContent="Plan "+year+" · "+de(vr[0],true)+" bis "+de(vr[1],true);renderKonto();renderTools();renderWarns();renderMonths();renderDay();renderLists();renderSettings();try{renderVeda()}catch(e){console.error(e)}}
+$("yearLbl").textContent=year;var vr=viewRange();$("planSub").textContent="Plan "+year+" · "+de(vr[0],true)+" bis "+de(vr[1],true);renderKonto();renderTools();renderWarns();renderMonths();renderDay();renderLists();renderSettings();try{renderVeda()}catch(e){console.error(e)}try{renderTeam()}catch(e){console.error(e)}
+$("hiName").textContent=S.profil&&S.profil.name?"Hallo "+S.profil.name+"!":"Hallo!"}
 
 var tT;
 function toast(msg,withUndo){$("toastMsg").textContent=msg;$("toastUndo").hidden=!withUndo;$("toast").hidden=false;clearTimeout(tT);tT=setTimeout(function(){$("toast").hidden=true},4000)}
@@ -1127,17 +1199,101 @@ $("tAdd").addEventListener("click",function(){
 (function(){var h=holidays(2027);$("tFt").innerHTML=Object.keys(h).map(function(d){return '<option>'+h[d]+'</option>'}).join("")})();
 /* ---------- Startabfrage ---------- */
 function showSetup(){var k=konto(year);document.querySelectorAll(".suY1").forEach(function(e){e.textContent=year-1});document.querySelectorAll(".suY2").forEach(function(e){e.textContent=year});
+  $("suName").value=S.profil.name||"";$("suKz").value=S.profil.kuerzel||"";$("suTeam").value=(S.team||[]).join(", ");$("suAz1").value=hm(S.arbeitszeit[1]);$("suAz5").value=hm(S.arbeitszeit[5]);
   $("suRest").value=S.konten[String(year)]?k.stand:"";$("suAnspruch").value=k.anspruch||30;var g=gleitCalc();$("suGz").value=g.last?hm(g.last.min):"";$("suErr").hidden=true;$("setup").hidden=false;setTimeout(function(){$("suRest").focus()},50)}
 $("setupForm").addEventListener("submit",function(e){e.preventDefault();
   var r=$("suRest").value.trim(),an=+$("suAnspruch").value;
   if(r===""||isNaN(+r)||+r<0){$("suErr").textContent="Bitte trage deinen Resturlaub ein (0, wenn du keinen hast).";$("suErr").hidden=false;return}
   var gz=$("suGz").value.trim(),gv=gz?parseHM(gz):null;if(gz&&gv===null){$("suErr").textContent="Gleitzeit bitte als Stunden eingeben, z. B. 14:30.";$("suErr").hidden=false;return}
+  var kz=$("suKz").value.trim().toUpperCase();if(!kz){$("suErr").textContent="Bitte trage dein Kürzel ein (z. B. AB). Es erscheint in der Teamansicht.";$("suErr").hidden=false;return}
+  var a1=parseHM($("suAz1").value),a5=parseHM($("suAz5").value);
+  S.profil={name:$("suName").value.trim(),kuerzel:kz,zeile:S.profil.zeile||""};
+  var tm=$("suTeam").value.split(/[,;\s]+/).map(function(x){return x.trim().toUpperCase()}).filter(function(x){return x&&x!==kz});if(tm.length)S.team=tm;
+  if(a1!==null&&a1>0)[1,2,3,4].forEach(function(i){S.arbeitszeit[i]=a1});if(a5!==null&&a5>0)S.arbeitszeit[5]=a5;for(var hk in hCache)delete hCache[hk];
   var k=konto(year);S.konten[String(year)]={anspruch:an>=0?an:30,stand:+r,standDatum:todayIso,restBis:k.restBis||iso(year,4,31)};
   if(gv!==null){S.gleitzeit=S.gleitzeit.filter(function(x){return x.datum!==todayIso});S.gleitzeit.push({datum:todayIso,min:gv})}
   S.setupDone=true;save();$("setup").hidden=true;render();toast("Gespeichert. Viel Spaß beim Planen!")});
 document.addEventListener("submit",function(e){if(e.target.id!=="wtForm")return;e.preventDefault();var d=selected;if(!d||!S.wichtig[d])return;snapshot();
   S.wichtig[d]={titel:$("wtTitel").value.trim()||"Wichtiger Termin",von:$("wtVon").value,bis:$("wtBis").value,notiz:$("wtNotiz").value.trim()};editing=null;save();render();toast("Termin gespeichert",true)});
 document.addEventListener("change",function(e){var t=e.target;if(t.dataset&&t.dataset.bsub!==undefined){var b=renderLists.bl[+t.dataset.bsub];if(!b)return;snapshot();b.days.forEach(function(d){S.urlaub[d]=t.value});save();render();toast("Vertretung "+t.value+" für "+rangeTxt(b.from,b.to)+" eingetragen",true)}});
+/* ---------- Team ---------- */
+var tMonth=null;
+function teamFile(){var o={typ:"urlaubsplaner-team",version:1,kuerzel:S.profil.kuerzel||"",name:S.profil.name||"",stand:new Date().toISOString(),
+  urlaub:S.urlaub,gleittage:Object.keys(S.gleittage||{}).sort(),vertretung:S.vertretung,vertreter:S.team||[]};return o}
+function readTeamFile(txt){try{var o=JSON.parse(txt);if(!o||o.typ!=="urlaubsplaner-team"||!o.kuerzel||typeof o.urlaub!=="object")return null;
+  var g={};(o.gleittage||[]).forEach(function(d){if(/^\d{4}-\d{2}-\d{2}$/.test(d))g[d]=true});
+  function clean(m){var r={};Object.keys(m||{}).forEach(function(d){if(/^\d{4}-\d{2}-\d{2}$/.test(d))r[d]=String(m[d]==null?"":m[d]).slice(0,20)});return r}
+  return {kuerzel:String(o.kuerzel).toUpperCase().slice(0,6),name:String(o.name||"").slice(0,40),stand:String(o.stand||""),urlaub:clean(o.urlaub),gleittage:g,vertretung:clean(o.vertretung)}}catch(e){return null}}
+function teamImport(txts){var ok=[],bad=0,own=0;
+  txts.forEach(function(t){var m=readTeamFile(t);if(!m){bad++;return}if(S.profil.kuerzel&&m.kuerzel===S.profil.kuerzel){own++;return}ok.push(m)});
+  if(ok.length){snapshot();ok.forEach(function(m){S.kollegen[m.kuerzel]=m});save();render()}
+  var msg=ok.length?ok.map(function(m){return (m.name||m.kuerzel)+" ("+m.kuerzel+")"}).join(", ")+" geladen.":"";
+  if(own)msg+=" Das ist deine eigene Teamdatei, die brauchst du nicht zu laden.";if(bad)msg+=" "+bad+" Datei"+(bad>1?"en sind":" ist")+" keine Teamdatei des Urlaubsplaners.";
+  toast(msg.trim()||"Nichts geladen",!!ok.length)}
+function members(){var me={kz:S.profil.kuerzel||"Ich",name:S.profil.name||"Ich",urlaub:S.urlaub,gleit:S.gleittage||{},vert:S.vertretung,me:true};
+  return [me].concat(Object.keys(S.kollegen||{}).sort().map(function(k){var m=S.kollegen[k];return {kz:m.kuerzel,name:m.name||m.kuerzel,urlaub:m.urlaub||{},gleit:m.gleittage||{},vert:m.vertretung||{},stand:m.stand}}))}
+function mAbsent(p,d){return isWorkday(d)&&(p.urlaub[d]!==undefined||!!p.gleit[d])}
+function mSubs(p,d){var v=p.urlaub[d];if(!v||v==="NN")return [];return String(v).toUpperCase().split(/[\/,+ ]+/).filter(Boolean)}
+function teamConflicts(){var ms=members(),by={},r=viewRange(),out={},cells={};ms.forEach(function(m){by[m.kz]=m});
+  function add(key,txt,d,serious,who){var o=out[key]||(out[key]={t:txt,days:[],serious:serious});o.days.push(d);(who||[]).forEach(function(w){cells[w+"|"+d]=1})}
+  var d=r[0];while(d<=r[1]){if(isWorkday(d)){var abs=ms.filter(function(m){return mAbsent(m,d)});
+    abs.forEach(function(p){var subs=mSubs(p,d);
+      if(p.urlaub[d]!==undefined&&!subs.length)add("nn|"+p.kz,p.name+" ("+p.kz+"): Vertretung noch offen (NN)",d,false,[]);
+      subs.forEach(function(sk){var q=by[sk];if(!q)return;
+        if(mAbsent(q,d))add("both|"+p.kz+"|"+sk,p.name+" ("+p.kz+") ist weg, die Vertretung "+q.name+" ("+sk+") aber auch",d,true,[p.kz,sk]);
+        else{var qv=String(q.vert[d]||"").toUpperCase().split(/[\/,+ ]+/);if(qv.indexOf(p.kz)<0)add("abspr|"+p.kz+"|"+sk,p.name+" ("+p.kz+") hat "+q.name+" ("+sk+") als Vertretung eingetragen, bei "+sk+" steht das aber nicht",d,false,[sk])}})});
+    if(ms.length>2&&abs.length===ms.length)add("alle","Alle "+ms.length+" sind gleichzeitig weg",d,true,ms.map(function(m){return m.kz}))}
+    d=addDays(d,1)}
+  var list=Object.keys(out).map(function(k){var o=out[k],rs=[],cur=null;o.days.forEach(function(x){if(cur){var nx=addDays(cur.to,1),ok=true;while(nx<x){if(isWorkday(nx)){ok=false;break}nx=addDays(nx,1)}if(ok){cur.to=x;cur.n++;return}}cur={from:x,to:x,n:1};rs.push(cur)});
+    return rs.map(function(rg){return {t:o.t,from:rg.from,to:rg.to,n:rg.n,serious:o.serious}})}).reduce(function(a,b){return a.concat(b)},[]).sort(function(a,b){return (b.serious-a.serious)||(a.from<b.from?-1:1)});
+  return {list:list,cells:cells}}
+function renderTeam(){if(!$("tgWrap"))return;var r=viewRange();
+  if(!tMonth){var t=todayIso.slice(0,7)+"-01";tMonth=(t<r[0]?r[0].slice(0,7)+"-01":(t>r[1]?r[1].slice(0,7)+"-01":t))}
+  var y=+tMonth.slice(0,4),m=+tMonth.slice(5,7)-1,len=new Date(Date.UTC(y,m+1,0)).getUTCDate(),ms=members(),tc=teamConflicts();
+  $("tmLbl").textContent=MONTHS[m]+" "+y;
+  var h='<table class="tg"><thead><tr><th class="pn"></th>';
+  for(var i=1;i<=len;i++){var d=iso(y,m,i);h+='<th class="'+(isFree(d)?'we':'')+'">'+WD[dow(d)]+'<br>'+i+'</th>'}
+  h+='</tr></thead><tbody>';
+  ms.forEach(function(p){h+='<tr class="'+(p.me?'me':'')+'"><th class="pn">'+esc(p.kz)+'<small>'+esc(p.me?"ich":(p.name||""))+'</small></th>';
+    for(var i=1;i<=len;i++){var d=iso(y,m,i),c=[],txt="",ttl=WDL[dow(d)]+", "+de(d,true)+": "+p.name;
+      var ft=holiday(d);if(isFree(d))c.push(ft?"ft":"we");
+      if(p.urlaub[d]!==undefined&&!isFree(d)){c.push("ur");txt=p.urlaub[d]||"NN";ttl+=" Urlaub, Vertretung "+txt}
+      else if(p.gleit[d]&&!isFree(d)){c.push("gt");txt="G";ttl+=" Gleittag"}
+      else if(p.vert[d]){c.push("vt");txt=p.vert[d];ttl+=" vertritt "+txt}
+      if(tc.cells[p.kz+"|"+d])c.push("cf");if(d===todayIso)c.push("today");
+      h+='<td class="'+c.join(" ")+'" title="'+esc(ttl)+'">'+esc(String(txt).replace("/","/\u200b"))+'</td>'}
+    h+='</tr>'});
+  $("tgWrap").innerHTML=h+'</tbody></table>';
+  $("tcRange").textContent="("+de(r[0],true)+" bis "+de(r[1],true)+")";
+  $("tConf").innerHTML=ms.length<2?'<div class="sub">Lade die Teamdateien deiner Kolleginnen und Kollegen, dann siehst du hier Überschneidungen.</div>':
+    (tc.list.length?'<ul class="tlist">'+tc.list.slice(0,60).map(function(c){return '<li class="'+(c.serious?'w':'')+'"><span>'+esc(rangeTxt(c.from,c.to))+' · '+esc(c.t)+'</span><button class="btn" data-tgo="'+c.from+'">Anzeigen</button></li>'}).join("")+'</ul>':'<div class="okmsg">Keine Konflikte. Alle Abwesenheiten sind abgedeckt.</div>');
+  var ks=Object.keys(S.kollegen||{}).sort();
+  $("tMembers").innerHTML=ks.length?ks.map(function(k){var m=S.kollegen[k],st=m.stand?new Date(m.stand):null,age=st?Math.floor((Date.now()-st)/864e5):null;
+    return '<li><span><b>'+esc(m.name||k)+'</b> ('+esc(k)+') <span class="sub">Stand '+(st&&!isNaN(st)?st.toLocaleDateString("de-DE"):"unbekannt")+(age>30?' · älter als 30 Tage':'')+' · '+Object.keys(m.urlaub||{}).length+' Urlaubstage</span></span><button class="btn" data-tdel="'+esc(k)+'">Entfernen</button></li>'}).join(""):
+    '<li><span class="sub">Noch keine Pläne geladen.</span></li>'}
+function shareTeam(){var kz=S.profil.kuerzel;if(!kz){toast("Bitte zuerst unter Optionen dein Kürzel eintragen.");return}
+  var txt=JSON.stringify(teamFile()),name="Urlaubsplan_"+kz+"_"+todayIso+".json";
+  if(!(window.claude&&window.claude.use)&&navigator.canShare){try{var f=new File([txt],name,{type:"application/json"});
+    if(navigator.canShare({files:[f]})){navigator.share({files:[f],title:"Urlaubsplan "+kz}).then(function(){$("tShareInfo").textContent="Geteilt."},function(e){if(e&&e.name!=="AbortError")saveFile(name,new Blob([txt],{type:"application/json"}),"tShareInfo")});return}}catch(e){}}
+  saveFile(name,new Blob([txt],{type:"application/json"}),"tShareInfo")}
+$("tShare").addEventListener("click",shareTeam);
+$("tCopy").addEventListener("click",function(){if(!S.profil.kuerzel){toast("Bitte zuerst unter Optionen dein Kürzel eintragen.");return}
+  try{navigator.clipboard.writeText(JSON.stringify(teamFile())).then(function(){$("tShareInfo").textContent="Kopiert. Füge den Text in eine Nachricht ein. Die anderen kopieren ihn und tippen bei sich auf „Aus Zwischenablage einfügen“."},function(){$("tShareInfo").textContent="Kopieren ging hier nicht. Nutze „Teamdatei teilen“."})}catch(e){$("tShareInfo").textContent="Kopieren ging hier nicht. Nutze „Teamdatei teilen“."}});
+$("tFile").addEventListener("change",function(){var fs=[].slice.call(this.files),txts=[],n=fs.length;if(!n)return;this.value="";
+  fs.forEach(function(f){var r=new FileReader();r.onload=function(){txts.push(String(r.result));if(txts.length===n)teamImport(txts)};r.onerror=function(){txts.push("");if(txts.length===n)teamImport(txts)};r.readAsText(f)})});
+$("tPaste").addEventListener("click",function(){function manual(){$("tText").hidden=false;$("tTextRow").hidden=false;$("tText").focus()}
+  try{navigator.clipboard.readText().then(function(t){if(readTeamFile(t))teamImport([t]);else manual()},manual)}catch(e){manual()}});
+$("tTextGo").addEventListener("click",function(){teamImport([$("tText").value]);$("tText").value="";$("tText").hidden=true;$("tTextRow").hidden=true});
+$("tmPrev").addEventListener("click",function(){var y=+tMonth.slice(0,4),m=+tMonth.slice(5,7)-2;if(m<0){m=11;y--}tMonth=iso(y,m,1);renderTeam()});
+$("tmNext").addEventListener("click",function(){var y=+tMonth.slice(0,4),m=+tMonth.slice(5,7);if(m>11){m=0;y++}tMonth=iso(y,m,1);renderTeam()});
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-tdel],[data-tgo]");if(!t)return;
+  if(t.dataset.tdel){var k=t.dataset.tdel;snapshot();delete S.kollegen[k];save();render();toast("Plan von "+k+" entfernt",true);return}
+  if(t.dataset.tgo){tMonth=t.dataset.tgo.slice(0,7)+"-01";renderTeam();$("tgWrap").scrollIntoView({behavior:"smooth",block:"center"})}});
+/* Profil-Nachfrage */
+function askProfil(){$("pfName").value=S.profil.name||"";$("pfKz").value=S.profil.kuerzel||"";$("pfZeile").value=S.profil.zeile||"";$("profil").hidden=false}
+$("profForm").addEventListener("submit",function(e){e.preventDefault();var kz=$("pfKz").value.trim().toUpperCase();
+  if(!kz){$("pfErr").textContent="Bitte trage dein Kürzel ein.";$("pfErr").hidden=false;return}
+  S.profil={name:$("pfName").value.trim(),kuerzel:kz,zeile:String($("pfZeile").value||"").trim()};S.team=(S.team||[]).filter(function(x){return x!==kz});save();$("profil").hidden=true;render();toast("Gespeichert. Die Teamansicht findest du links unter „Team“.")});
 /* ---------- VEDA-Abgleich ---------- */
 var VKEY=KEY+".vedaUrl";
 function vedaUrlGet(){try{return localStorage.getItem(VKEY)||""}catch(e){return ""}}
@@ -1274,6 +1430,7 @@ function saveFile(name,blob,infoId,onReject){
   if(window.claude&&window.claude.use){window.claude.use("downloads").then(function(dl){if(!dl){viaLink();return}
     dl.save({filename:name,data:blob}).then(function(){info.textContent="„"+name+"“ gespeichert."},function(e){if(onReject&&e&&e.code==="rejected_extension"){onReject(dl);return}info.textContent=e&&e.code==="declined"?"Speichern abgebrochen.":"Speichern ging hier nicht. Nutze „Tabelle kopieren“ und füge sie in Excel ein."})},viaLink)}
   else viaLink()}
+function bzCellTxt(){return S.profil&&S.profil.zeile?"C"+S.profil.zeile:"Spalte C in deiner Zeile"}
 /* Büro-Tabelle: C1 = 01.01. des Jahres, 372 Tage bis NJ (07.01. Folgejahr) */
 function bueroRow(withCover){var start=iso(year,0,1),out=[];
   for(var i=0;i<372;i++){var d=addDays(start,i),v="";
@@ -1307,7 +1464,7 @@ $("expCopy").addEventListener("click",function(){var ex=exportData(),txt=toTSV(e
   try{navigator.clipboard.writeText(txt).then(function(){$("expInfo").textContent="Kopiert: Einzeltage und darunter die Zeiträume. In Excel in Zelle A1 tippen und „Einsetzen“ wählen."},function(){$("expInfo").textContent="Kopieren ging hier nicht. Nutze „Excel-Datei speichern“."})}catch(e){$("expInfo").textContent="Kopieren ging hier nicht. Nutze „Excel-Datei speichern“."}});
 $("bzCopy").addEventListener("click",function(){var r=bueroRow($("bzVt").checked),txt=r.map(function(x){return x.v}).join("\t"),
   nU=r.filter(function(x){return typeof x.v==="string"&&x.v}).length,nNN=r.filter(function(x){return x.v==="NN"}).length,nV=r.filter(function(x){return x.v===1}).length;
-  var msg="Kopiert: 372 Felder (01.01."+year+" bis 07.01."+(year+1)+"), davon "+nU+" Urlaubstage"+(nNN?" ("+nNN+" × NN)":"")+(nV?" und "+nV+" Vertretungstage":"")+". Jetzt in der Büro-Tabelle C16 antippen und „Einsetzen“ wählen. Achtung: Das überschreibt die ganze Zeile 16 ab C.";
+  var msg="Kopiert: 372 Felder (01.01."+year+" bis 07.01."+(year+1)+"), davon "+nU+" Urlaubstage"+(nNN?" ("+nNN+" × NN)":"")+(nV?" und "+nV+" Vertretungstage":"")+". Jetzt in der Büro-Tabelle "+bzCellTxt()+" antippen und „Einsetzen“ wählen. Achtung: Das überschreibt deine ganze Zeile ab Spalte C.";
   try{navigator.clipboard.writeText(txt).then(function(){$("bzInfo").textContent=msg},function(){$("bzInfo").textContent="Kopieren ging hier nicht. In der Excel-Datei (Excel-Datei speichern) gibt es das Blatt „Büro-Zeile“ zum Kopieren."})}catch(e){$("bzInfo").textContent="Kopieren ging hier nicht. In der Excel-Datei gibt es das Blatt „Büro-Zeile“ zum Kopieren."}});
 $("icsSave").addEventListener("click",function(){var c=buildIcs(),name="Urlaub_RM_"+year+".ics";
   if(!c.n){$("icsInfo").textContent="Es gibt noch keine Einträge für den Kalender.";return}
@@ -1329,6 +1486,7 @@ $("saveSettings").addEventListener("click",function(){
   S.freieTage=$("sFrei").value.split(/[,;\s]+/).map(function(t){var m=t.match(/^(\d{1,2})\.(\d{1,2})\.?$/);return m?String(+m[2]).padStart(2,"0")+"-"+String(+m[1]).padStart(2,"0"):null}).filter(Boolean);
   for(var hk in hCache)delete hCache[hk];
   var tm=$("sTeam").value.split(/[,;\s]+/).map(function(x){return x.trim().toUpperCase()}).filter(Boolean);if(tm.length)S.team=tm;
+  var nkz=$("sKz").value.trim().toUpperCase();S.profil={name:$("sName").value.trim(),kuerzel:nkz||S.profil.kuerzel,zeile:String($("sZeile").value||"").trim()};
   save();render();toast("Einstellungen übernommen",true);
 });
 function exportText(){return JSON.stringify(S,null,1)}
@@ -1342,7 +1500,7 @@ $("copyBtn").addEventListener("click",function(){
   try{navigator.clipboard.writeText(txt).then(function(){toast("Sicherung in die Zwischenablage kopiert")},function(){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")})}catch(e){$("ioText").select();toast("Text markiert. Bitte selbst kopieren.")}
 });
 function importFrom(txt){
-  try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien||!o.vertretung)throw 0;snapshot();S=migrate(o);S.setupDone=true;if(!S.team)S.team=["CT","SM","MPB"];if(!S.konten)S.konten={};for(var hk in hCache)delete hCache[hk];save();$("setup").hidden=true;render();renderStore();toast("Daten geladen und gespeichert",true)}
+  try{var o=JSON.parse(txt);if(!o||!o.urlaub||!o.ferien||!o.vertretung)throw 0;snapshot();S=migrate(o);S.setupDone=true;if(!S.team)S.team=["CT","SM","MPB"];if(!S.konten)S.konten={};for(var hk in hCache)delete hCache[hk];save();$("setup").hidden=true;render();renderStore();toast("Daten geladen und gespeichert",true);if(!S.profil.kuerzel)askProfil()}
   catch(e){toast("Das ist keine gültige Sicherung des Urlaubsplaners.")}
 }
 $("importText").addEventListener("click",function(){importFrom($("ioText").value)});
@@ -1360,7 +1518,7 @@ var ty=new Date().getFullYear();year=S.konten[String(ty+1)]?ty+1:(S.konten[Strin
 render();
 showView((location.hash||"").slice(1)||"kalender",true);
 window.addEventListener("hashchange",function(){showView(location.hash.slice(1),true)});
-if(!S.setupDone)showSetup();
+if(!S.setupDone)showSetup();else if(!S.profil.kuerzel)askProfil();
 restore();renderStore();if(vedaUrlGet())setTimeout(function(){vedaFetch(true)},1500);
 $("storeWarnX").addEventListener("click",function(){$("storeWarn").hidden=true});
 window.__planner={exportData:exportData,buildXlsx:buildXlsx,toTSV:toTSV,gleitCalc:gleitCalc,terminInstances:terminInstances,suggestions:suggestions,parseHM:parseHM,calc:calc,holidays:holidays,blocks:blocks,conflicts:conflicts,isWorkday:isWorkday,easter:easter,kw:kw,get state(){return S}};
